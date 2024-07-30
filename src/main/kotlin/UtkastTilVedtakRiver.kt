@@ -2,7 +2,7 @@ import no.nav.helse.rapids_rivers.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
-class UtkastTilVedtakRiver(rapidsConnection: RapidsConnection): River.PacketListener {
+class UtkastTilVedtakRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
@@ -14,7 +14,14 @@ class UtkastTilVedtakRiver(rapidsConnection: RapidsConnection): River.PacketList
         }.register(this)
     }
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        sikkerlogg.info("Lagrer snart nytting data til potensiell G-regulering:\n\t${packet.toJson()}")
+        sikkerlogg.info("Lagrer nytting data til potensiell G-regulering:\n\t${packet.toJson()}")
+        val anvendtGrunnbeløpDto = AnvendtGrunnbeløpDto(
+            aktørId = packet["aktørId"].asText(),
+            personidentifikator = packet["fødselsnummer"].asText(),
+            skjæringstidspunkt = packet["skjæringstidspunkt"].asLocalDate(),
+            `6G` = packet["sykepengegrunnlagsfakta.6G"].asDouble()
+        )
+        anvendtGrunnbeløpDao.lagre(anvendtGrunnbeløpDto)
     }
 
     private companion object {

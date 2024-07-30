@@ -3,6 +3,12 @@ plugins {
 }
 
 val rapidsAndRiversVersion = "2024061408021718344972.64ebbdb34321"
+val flywayCoreVersion = "10.17.0"
+val postgresqlVersion = "42.7.3"
+val kotliqueryVersion = "1.9.0"
+val hikariCPVersion = "5.1.0"
+val junitJupiterVersion = "5.10.3"
+val tbdLibsVersion = "2024.05.31-08.02-2c3441c1"
 
 repositories {
     val githubPassword: String? by project
@@ -23,6 +29,15 @@ repositories {
 
 dependencies {
     implementation("com.github.navikt:rapids-and-rivers:$rapidsAndRiversVersion")
+    api("org.flywaydb:flyway-core:$flywayCoreVersion")
+    api("org.flywaydb:flyway-database-postgresql:$flywayCoreVersion")
+    implementation("com.zaxxer:HikariCP:$hikariCPVersion")
+    implementation("org.postgresql:postgresql:$postgresqlVersion")
+    implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+    testImplementation("com.github.navikt.tbd-libs:postgres-testdatabaser:$tbdLibsVersion")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks {
