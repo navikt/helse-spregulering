@@ -9,6 +9,7 @@ val kotliqueryVersion = "1.9.0"
 val hikariCPVersion = "5.1.0"
 val junitJupiterVersion = "5.10.3"
 val tbdLibsVersion = "2024.05.31-08.02-2c3441c1"
+val mockkVersion = "1.13.12"
 
 repositories {
     val githubPassword: String? by project
@@ -38,6 +39,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("com.github.navikt.tbd-libs:postgres-testdatabaser:$tbdLibsVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("io.mockk:mockk:$mockkVersion")
 }
 
 tasks {
