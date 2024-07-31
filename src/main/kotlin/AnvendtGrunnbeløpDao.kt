@@ -22,17 +22,23 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         }
     }
 
-    fun hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra: LocalDate, riktigGrunnbeløp: Double): List<AnvendtGrunnbeløpDto> {
+    fun hentFeilanvendteGrunnbeløp(
+        grunnbeløpGjelderFra: LocalDate,
+        grunnbeløpGjelderTil: LocalDate,
+        riktigGrunnbeløp: Double
+    ): List<AnvendtGrunnbeløpDto> {
         val riktigSeksG = riktigGrunnbeløp * 6
         @Language("PostgreSQL")
         val statement = """
             SELECT * FROM anvendt_grunnbeloep
             WHERE skjaeringstidspunkt >= :grunnbeloep_gjelder_fra
+            AND skjaeringstidspunkt <= :grunnbeloep_gjelder_til
             AND seks_g != :riktig_seks_g
         """
         return sessionOf(dataSource).use { session ->
             session.run(queryOf(statement, mapOf(
                 "grunnbeloep_gjelder_fra" to grunnbeløpGjelderFra,
+                "grunnbeloep_gjelder_til" to grunnbeløpGjelderTil,
                 "riktig_seks_g" to riktigSeksG
             )).map { AnvendtGrunnbeløpDto(
                 aktørId = it.string("aktor_id"),
