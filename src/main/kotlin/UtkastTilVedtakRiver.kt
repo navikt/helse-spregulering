@@ -7,7 +7,7 @@ class UtkastTilVedtakRiver(rapidsConnection: RapidsConnection, private val anven
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandAny("@event_name", listOf("avsluttet_med_vedtak", "utkast_til_vedtak"))
+                it.demandValue("@event_name", "utkast_til_vedtak")
                 it.requireKey("sykepengegrunnlagsfakta.6G", "aktørId", "fødselsnummer")
                 it.require("skjæringstidspunkt") { skjæringstidspunkt -> LocalDate.parse(skjæringstidspunkt.asText()) }
             }

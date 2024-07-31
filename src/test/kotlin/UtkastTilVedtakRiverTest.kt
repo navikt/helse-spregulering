@@ -6,7 +6,7 @@ import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class UtkastTilVedtakRiverTest() {
+class UtkastTilVedtakRiverTest {
 
     private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao = mockk()
     private val testRapid = TestRapid().apply {
@@ -21,14 +21,6 @@ class UtkastTilVedtakRiverTest() {
     @Test
     fun `lagrer data fra utkast_til_vedtak`() {
         testRapid.sendTestMessage(event("utkast_til_vedtak"))
-        verify(exactly = 1) {
-            anvendtGrunnbeløpDao.lagre(any())
-        }
-    }
-
-    @Test
-    fun `lagrer data fra avsluttet_med_vedtak`() {
-        testRapid.sendTestMessage(event("avsluttet_med_vedtak"))
         verify(exactly = 1) {
             anvendtGrunnbeløpDao.lagre(any())
         }
