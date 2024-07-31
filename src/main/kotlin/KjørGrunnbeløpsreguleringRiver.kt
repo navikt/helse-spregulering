@@ -27,7 +27,7 @@ class KjørGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, priva
 
     private companion object {
         private val sikkerlogg = LoggerFactory.getLogger("tjenestekall")
-        private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() = JsonMessage.newMessage("tullete_grunnbeløpsregulering", mapOf(
+        private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() = JsonMessage.newMessage("grunnbeløpsregulering", mapOf(
             "fødselsnummer" to personidentifikator,
             "aktørId" to aktørId,
             "skjæringstidspunkt" to skjæringstidspunkt
