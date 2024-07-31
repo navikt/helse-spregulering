@@ -6,7 +6,8 @@ fun main() {
     val dataSourceBuilder = DataSourceBuilder(env)
     val anvendtGrunnbeløpDao = AnvendtGrunnbeløpDao(dataSourceBuilder.getDataSource())
     RapidApplication.create(env).apply {
-        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao )
+        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao)
+        KjørGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
     }.apply {
         register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {

@@ -48,6 +48,31 @@ class AnvendtGrunnbeløpDaoTest {
     }
 
     @Test
+    fun `finner feilanvendte grunnbeløp`() {
+        val riktigGrunnbeløp = 200_000.0
+        val feilGrunnbeløp = 250_000.0
+        val grunnbeløpGjelderFra = LocalDate.parse("2018-01-01")
+
+        val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
+            aktørId = "1A",
+            personidentifikator = "1B",
+            skjæringstidspunkt = grunnbeløpGjelderFra,
+            `6G`= riktigGrunnbeløp * 6
+        )
+        val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
+            aktørId = "2A",
+            personidentifikator = "2B",
+            skjæringstidspunkt = grunnbeløpGjelderFra,
+            `6G`= feilGrunnbeløp * 6
+        )
+        dao.lagre(anvendtGrunnbeløp1)
+        dao.lagre(anvendtGrunnbeløp2)
+
+        val feilanvendteGrunnbeløp = dao.hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra, riktigGrunnbeløp)
+        assertEquals(listOf(anvendtGrunnbeløp2), feilanvendteGrunnbeløp)
+    }
+
+    @Test
     fun `oppdaterer sykefraværstilfelle ved ny g`() {
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
             aktørId = "1A",

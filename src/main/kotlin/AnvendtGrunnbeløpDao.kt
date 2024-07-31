@@ -1,6 +1,7 @@
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.intellij.lang.annotations.Language
+import java.time.LocalDate
 import javax.sql.DataSource
 
 class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
@@ -18,6 +19,27 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
                 "skjaeringstidspunkt" to anvendtGrunnbeløpDto.skjæringstidspunkt,
                 "seks_g" to anvendtGrunnbeløpDto.`6G`
             )).asExecute)
+        }
+    }
+
+    fun hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra: LocalDate, riktigGrunnbeløp: Double): List<AnvendtGrunnbeløpDto> {
+        val riktigSeksG = riktigGrunnbeløp * 6
+        @Language("PostgreSQL")
+        val statement = """
+            SELECT * FROM anvendt_grunnbeloep
+            WHERE skjaeringstidspunkt >= :grunnbeloep_gjelder_fra
+            AND seks_g != :riktig_seks_g
+        """
+        return sessionOf(dataSource).use { session ->
+            session.run(queryOf(statement, mapOf(
+                "grunnbeloep_gjelder_fra" to grunnbeløpGjelderFra,
+                "riktig_seks_g" to riktigSeksG
+            )).map { AnvendtGrunnbeløpDto(
+                aktørId = it.string("aktor_id"),
+                personidentifikator = it.string("personidentifikator"),
+                skjæringstidspunkt = it.localDate("skjaeringstidspunkt"),
+                `6G` = it.double("seks_g"),
+            ) }.asList)
         }
     }
 }
