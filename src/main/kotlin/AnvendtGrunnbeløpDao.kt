@@ -49,6 +49,21 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         }
     }
 
+    fun slettSykefraværstilfelle(personidentifikator: String, skjæringstidspunkt: LocalDate) {
+        @Language("PostgreSQL")
+        val statement = """
+            DELETE FROM anvendt_grunnbeloep 
+            WHERE personidentifikator = :personidentifikator 
+            AND skjaeringstidspunkt = :skjaeringstidspunkt
+        """
+        sessionOf(dataSource).use { session ->
+            session.run(queryOf(statement, mapOf(
+                "personidentifikator" to personidentifikator,
+                "skjaeringstidspunkt" to skjæringstidspunkt
+            )).asExecute)
+        }
+    }
+
     private companion object {
         private val Minish = LocalDate.parse("0000-01-01")
         private val Maxish = LocalDate.parse("9999-12-31")

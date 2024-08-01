@@ -92,6 +92,30 @@ class AnvendtGrunnbeløpDaoTest {
         assertEquals(listOf(anvendtGrunnbeløp2), hentAlle())
     }
 
+    @Test
+    fun `slette sykefraværstilfelle`() {
+        val skjæringstidspunkt = LocalDate.parse("2018-01-01")
+        val personidentifikator = "1B"
+        val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
+            aktørId = "1A",
+            personidentifikator = personidentifikator,
+            skjæringstidspunkt = skjæringstidspunkt,
+            `6G`= 123123.3
+        )
+        val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
+            aktørId = "1A",
+            personidentifikator = personidentifikator,
+            skjæringstidspunkt = LocalDate.parse("2019-01-01"),
+            `6G`= 123123.3
+        )
+        dao.lagre(anvendtGrunnbeløp1)
+        dao.lagre(anvendtGrunnbeløp2)
+        assertEquals(listOf(anvendtGrunnbeløp1, anvendtGrunnbeløp2), hentAlle())
+
+        dao.slettSykefraværstilfelle(personidentifikator, skjæringstidspunkt)
+        assertEquals(listOf(anvendtGrunnbeløp2), hentAlle())
+    }
+
     private fun hentAlle(): List<AnvendtGrunnbeløpDto> {
         return sessionOf(dataSource).use { session ->
             session.run(queryOf("SELECT * FROM anvendt_grunnbeloep").map { AnvendtGrunnbeløpDto(
