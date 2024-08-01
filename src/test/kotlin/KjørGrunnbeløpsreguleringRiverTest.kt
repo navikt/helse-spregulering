@@ -5,7 +5,6 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class KjørGrunnbeløpsreguleringRiverTest {
 
@@ -16,14 +15,14 @@ class KjørGrunnbeløpsreguleringRiverTest {
 
     @BeforeEach
     fun setup() {
-        every { anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), LocalDate.of(9999, 1, 1), any()) }.answers { emptyList() }
+        every { anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), any(), any()) }.answers { emptyList() }
     }
 
     @Test
     fun `kjører grunnbeløpsregulering`() {
         testRapid.sendTestMessage(event("kjør_grunnbeløpsregulering", 101_000.0))
         verify(exactly = 1) {
-            anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), LocalDate.of(9999, 1, 1), any())
+            anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), any(), any())
         }
     }
 
@@ -31,7 +30,7 @@ class KjørGrunnbeløpsreguleringRiverTest {
     fun `kjører ikke grunnbeløpsregulering om noen er skikkelig på jordet med grunnbeløpet`() {
         testRapid.sendTestMessage(event("kjør_grunnbeløpsregulering", 1_000_000.0))
         verify(exactly = 0) {
-            anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), LocalDate.of(9999, 1, 1), any())
+            anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), any(), any())
         }
     }
 
@@ -39,7 +38,7 @@ class KjørGrunnbeløpsreguleringRiverTest {
     fun `kjører ikke grunnbeløpsregulering fra andre events`() {
         testRapid.sendTestMessage(event("tullete_kjøring", 101_000.0))
         verify(exactly = 0) {
-            anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), LocalDate.of(9999, 1, 1), any())
+            anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), any(), any())
         }
     }
 

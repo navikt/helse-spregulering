@@ -37,8 +37,8 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         """
         return sessionOf(dataSource).use { session ->
             session.run(queryOf(statement, mapOf(
-                "grunnbeloep_gjelder_fra" to grunnbeløpGjelderFra,
-                "grunnbeloep_gjelder_til" to grunnbeløpGjelderTil,
+                "grunnbeloep_gjelder_fra" to grunnbeløpGjelderFra.postgresifiser,
+                "grunnbeloep_gjelder_til" to grunnbeløpGjelderTil.postgresifiser,
                 "riktig_seks_g" to riktigSeksG
             )).map { AnvendtGrunnbeløpDto(
                 aktørId = it.string("aktor_id"),
@@ -47,5 +47,11 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
                 `6G` = it.double("seks_g"),
             ) }.asList)
         }
+    }
+
+    private companion object {
+        private val Minish = LocalDate.parse("0000-01-01")
+        private val Maxish = LocalDate.parse("9999-12-31")
+        private val LocalDate.postgresifiser get() = coerceAtLeast(Minish).coerceAtMost(Maxish)
     }
 }

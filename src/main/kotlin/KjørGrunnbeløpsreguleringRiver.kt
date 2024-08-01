@@ -16,7 +16,7 @@ class KjørGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, priva
     }
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val grunnbeløpGjelderFra = packet["grunnbeløpGjelderFra"].asLocalDate()
-        val grunnbeløpGjelderTil = packet["grunnbeløpGjelderTil"].takeUnless { it.isMissingOrNull() }?.asLocalDate() ?: LocalDate.of(9999, 1, 1)
+        val grunnbeløpGjelderTil = packet["grunnbeløpGjelderTil"].takeUnless { it.isMissingOrNull() }?.asLocalDate() ?: LocalDate.MAX
         val rikitgGrunnbeløp = packet["riktigGrunnbeløp"].asDouble()
         val feilanvendteGrunnbeløp = anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra, grunnbeløpGjelderTil, rikitgGrunnbeløp)
         sikkerlogg.info("Grunnbeløpsregulerer ${feilanvendteGrunnbeløp.size} sykefraværstilfeller:\n\t${packet.toJson()}")
