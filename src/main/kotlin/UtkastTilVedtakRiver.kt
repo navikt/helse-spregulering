@@ -2,7 +2,11 @@ import no.nav.helse.rapids_rivers.*
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
-class UtkastTilVedtakRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
+class UtkastTilVedtakRiver(
+    rapidsConnection: RapidsConnection,
+    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
+    val seksGDato: SeksGDao
+): River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
@@ -22,6 +26,7 @@ class UtkastTilVedtakRiver(rapidsConnection: RapidsConnection, private val anven
             `6G` = packet["sykepengegrunnlagsfakta.6G"].asDouble()
         )
         anvendtGrunnbeløpDao.lagre(anvendtGrunnbeløpDto)
+        seksGDato.registrer(anvendtGrunnbeløpDto.`6G`, anvendtGrunnbeløpDto.skjæringstidspunkt)
     }
 
     private companion object {

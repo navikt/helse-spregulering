@@ -9,13 +9,15 @@ import org.junit.jupiter.api.Test
 class UtkastTilVedtakRiverTest {
 
     private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao = mockk()
+    private val seksGDao: SeksGDao = mockk()
     private val testRapid = TestRapid().apply {
-        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao)
+        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao, seksGDao)
     }
 
     @BeforeEach
     fun setup() {
         every { anvendtGrunnbeløpDao.lagre(any()) }.answers {}
+        every { seksGDao.registrer(any(), any()) }.answers {}
     }
 
     @Test
