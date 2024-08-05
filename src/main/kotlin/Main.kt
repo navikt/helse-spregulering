@@ -10,6 +10,7 @@ fun main() {
         UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao, seksGDao)
         KjørGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
         SykefraværstilfelleIkkeFunnetRiver(this, anvendtGrunnbeløpDao)
+        MigrerteGrunnbeløpRiver(this, anvendtGrunnbeløpDao, seksGDao)
     }.apply {
         register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {
