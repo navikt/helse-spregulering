@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class SeksViewTest {
+class SeksGViewTest {
     private lateinit var testDataSource: TestDataSource
     private val dataSource get() = testDataSource.ds
     private val dao get() = AnvendtGrunnbeløpDao(dataSource)
