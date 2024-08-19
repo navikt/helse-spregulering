@@ -26,7 +26,7 @@ class IdentifiserFeilGrunnbeløpRiver(rapidsConnection: RapidsConnection, privat
     private companion object {
         private fun MessageContext.sendPåSlack(packet: JsonMessage, level: Level, melding: String) {
             val slackmelding = JsonMessage.newMessage("slackmelding", mapOf(
-                "melding" to "$melding\n\n - Deres erbødig SPregulering :money:",
+                "melding" to "\n$melding\n\n - Deres erbødig SPregulering :money:",
                 "level" to level.name,
                 "system_participating_services" to packet["system_participating_services"]
             )).toJson()
