@@ -5,12 +5,11 @@ fun main() {
     val env = System.getenv()
     val dataSourceBuilder = DataSourceBuilder(env)
     val anvendtGrunnbeløpDao = AnvendtGrunnbeløpDao(dataSourceBuilder.getDataSource())
-    val seksGDao = SeksGDao(dataSourceBuilder.getDataSource())
     RapidApplication.create(env).apply {
-        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao, seksGDao)
+        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao)
         KjørGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
         SykefraværstilfelleIkkeFunnetRiver(this, anvendtGrunnbeløpDao)
-        MigrerteGrunnbeløpRiver(this, anvendtGrunnbeløpDao, seksGDao)
+        MigrerteGrunnbeløpRiver(this, anvendtGrunnbeløpDao)
     }.apply {
         register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {

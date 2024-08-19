@@ -4,8 +4,7 @@ import java.time.LocalDate
 
 class UtkastTilVedtakRiver(
     rapidsConnection: RapidsConnection,
-    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
-    val seksGDato: SeksGDao
+    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao
 ): River.PacketListener {
 
     init {
@@ -26,7 +25,6 @@ class UtkastTilVedtakRiver(
             `6G` = packet["sykepengegrunnlagsfakta.6G"].asDouble()
         )
         anvendtGrunnbeløpDao.lagre(anvendtGrunnbeløpDto)
-        seksGDato.registrer(anvendtGrunnbeløpDto.`6G`, anvendtGrunnbeløpDto.skjæringstidspunkt)
     }
 
     private companion object {

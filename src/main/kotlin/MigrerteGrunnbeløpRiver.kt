@@ -4,8 +4,7 @@ import java.time.LocalDate
 
 class MigrerteGrunnbeløpRiver(
     rapidsConnection: RapidsConnection,
-    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
-    val seksGDato: SeksGDao
+    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao
 ): River.PacketListener {
 
     init {
@@ -32,7 +31,6 @@ class MigrerteGrunnbeløpRiver(
 
         anvendtGrunnbeløp.forEach {
             anvendtGrunnbeløpDao.lagre(it)
-            seksGDato.registrer(it.`6G`, it.skjæringstidspunkt)
         }
     }
 
