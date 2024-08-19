@@ -12,7 +12,10 @@ class UtkastTilVedtakRiver(
             validate {
                 it.demandValue("@event_name", "utkast_til_vedtak")
                 it.requireKey("sykepengegrunnlagsfakta.6G", "aktørId", "fødselsnummer")
-                it.require("skjæringstidspunkt") { skjæringstidspunkt -> LocalDate.parse(skjæringstidspunkt.asText()) }
+                it.require("skjæringstidspunkt") { skjæringstidspunkt ->
+                    val dato = LocalDate.parse(skjæringstidspunkt.asText())
+                    check(dato >= Virkningsdato2020Grunnbeløp)
+                }
             }
         }.register(this)
     }
@@ -28,6 +31,12 @@ class UtkastTilVedtakRiver(
     }
 
     private companion object {
+        /**
+         * Perioder med skjæringstidspunkt før denne datoen ble G-regulert på en annen måte.
+         * Dette var før revurderingenes tid i Spleis, og dette ble gjort med egne utbetalinger
+         * av typen ETTERUTBETALING. De kan ikke identifiseres ved hjelp av mekanismen Spregulering belager seg på.
+         */
+        private val Virkningsdato2020Grunnbeløp = LocalDate.parse("2020-09-21")
         private val sikkerlogg = LoggerFactory.getLogger("tjenestekall")
     }
 }

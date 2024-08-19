@@ -34,12 +34,29 @@ class UtkastTilVedtakRiverTest {
         }
     }
 
+    @Test
+    fun `lagrer ikke gammel moro`() {
+        testRapid.sendTestMessage(event("utkast_til_vedtak", "2020-09-20"))
+        verify(exactly = 0) {
+            anvendtGrunnbeløpDao.lagre(any())
+        }
+    }
+
+
+    @Test
+    fun `lagrer fra og med da vi var ferdig med gammal moro`() {
+        testRapid.sendTestMessage(event("utkast_til_vedtak", "2020-09-21"))
+        verify(exactly = 1) {
+            anvendtGrunnbeløpDao.lagre(any())
+        }
+    }
+
     @Language("JSON")
-    private fun event(eventName: String): String = """{
+    private fun event(eventName: String, skjæringstidspunkt: String = "2024-01-01"): String = """{
         "@event_name": "$eventName",
         "fødselsnummer": "fødselsnummer",
         "aktørId": "aktørId",
-        "skjæringstidspunkt": "2024-01-01",
+        "skjæringstidspunkt": "$skjæringstidspunkt",
         "sykepengegrunnlagsfakta": {
           "6G": 666666.0
         }

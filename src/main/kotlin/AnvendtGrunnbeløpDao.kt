@@ -85,7 +85,7 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         /**
          * Hvorfor akkurat denne spør du?
          * - Vi G-regulerte 2023 og 2024, så fra og med 1.Mai 2023 så skal alt være rett,
-         *   og eventuelle observasjoner etter dette er "feil" grunnbeløp.
+         *   og eventuelle observasjoner etter dette er "feil" grunnbeløp på sykefraværstilfeller.
          */
         private const val SeksG2023 = 711720.0
 
