@@ -4,7 +4,7 @@ import com.github.navikt.tbd_libs.test_support.TestDataSource
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -116,6 +116,19 @@ class AnvendtGrunnbeløpDaoTest {
         assertEquals(listOf(anvendtGrunnbeløp2), hentAlle())
     }
 
+    @Test
+    fun `er det noen sykefraværstilfeller med feil grunnbeløp`() {
+        assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        dao.lagre(1_000_000.0, LocalDate.parse("2018-05-01"))
+        dao.lagre(1_000_000.0, LocalDate.parse("2019-04-30"))
+        assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        dao.lagre(2_000_000.0, LocalDate.parse("2019-05-01"))
+        dao.lagre(2_000_000.0, LocalDate.parse("2020-04-30"))
+        assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        dao.lagre(1_000_000.0, LocalDate.parse("2020-01-01"))
+        assertTrue(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+    }
+
     private fun hentAlle(): List<AnvendtGrunnbeløpDto> {
         return sessionOf(dataSource).use { session ->
             session.run(queryOf("SELECT * FROM anvendt_grunnbeloep").map { AnvendtGrunnbeløpDto(
@@ -125,5 +138,14 @@ class AnvendtGrunnbeløpDaoTest {
                 `6G` = it.double("seks_g"),
             ) }.asList)
         }
+    }
+
+    private fun AnvendtGrunnbeløpDao.lagre(seksG: Double, skjæringstidspunkt: LocalDate) {
+        lagre(AnvendtGrunnbeløpDto(
+            aktørId = "1",
+            personidentifikator = "2",
+            skjæringstidspunkt = skjæringstidspunkt,
+            `6G`= seksG
+        ))
     }
 }

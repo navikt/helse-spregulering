@@ -1,3 +1,4 @@
+import Periode.Companion.overlapper
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.intellij.lang.annotations.Language
@@ -64,7 +65,30 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         }
     }
 
+    fun erDetNoenSykefraværstilfellerMedFeilGrunnbeløp(): Boolean {
+        @Language("PostgreSQL")
+        val statement = """
+            SELECT * FROM seks_g
+            WHERE seks_g >= $SeksG2023
+        """
+        val perioderMedUnikeGrunnbeløp = sessionOf(dataSource).use { session ->
+            session.run(queryOf(statement).map { row ->
+                Periode(row.localDate("tidligste_skjaeringstidspunkt"), row.localDate("seneste_skjaeringstidspunkt"))
+            }.asList)
+        }
+
+        // Om vi finner overlappende perioder på tvers av grunnbeløp så tyder det på at vi har brukt feil grunnbeløp
+        return perioderMedUnikeGrunnbeløp.overlapper()
+    }
+
     private companion object {
+        /**
+         * Hvorfor akkurat denne spør du?
+         * - Vi G-regulerte 2023 og 2024, så fra og med 1.Mai 2023 så skal alt være rett,
+         *   og eventuelle observasjoner etter dette er "feil" grunnbeløp.
+         */
+        private const val SeksG2023 = 711720.0
+
         private val Minish = LocalDate.parse("0000-01-01")
         private val Maxish = LocalDate.parse("9999-12-31")
         private val LocalDate.postgresifiser get() = coerceAtLeast(Minish).coerceAtMost(Maxish)
