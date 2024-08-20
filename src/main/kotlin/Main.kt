@@ -7,9 +7,9 @@ fun main() {
     val anvendtGrunnbeløpDao = AnvendtGrunnbeløpDao(dataSourceBuilder.getDataSource())
     RapidApplication.create(env).apply {
         UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao)
-        KjørGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
+        ManuellGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
         SykefraværstilfelleIkkeFunnetRiver(this, anvendtGrunnbeløpDao)
-        IdentifiserFeilGrunnbeløpRiver(this, anvendtGrunnbeløpDao)
+        AutomatiskGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
     }.apply {
         register(object : RapidsConnection.StatusListener {
             override fun onStartup(rapidsConnection: RapidsConnection) {

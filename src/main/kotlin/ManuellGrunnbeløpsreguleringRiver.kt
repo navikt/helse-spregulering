@@ -1,7 +1,7 @@
 import no.nav.helse.rapids_rivers.*
 import java.time.LocalDate
 
-class KjørGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
+class ManuellGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
 
     init {
         River(rapidsConnection).apply {

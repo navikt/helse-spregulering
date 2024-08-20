@@ -3,12 +3,13 @@ import org.slf4j.event.Level
 import org.slf4j.event.Level.ERROR
 import org.slf4j.event.Level.INFO
 
-class IdentifiserFeilGrunnbeløpRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
+class AutomatiskGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
 
     init {
         River(rapidsConnection).apply {
             validate {
-                it.demandAny("@event_name", listOf("hel_time", "identifiser_feil_grunnbeløp"))
+                it.demandAny("@event_name", listOf("hel_time", "kjør_grunnbeløpsregulering"))
+                it.rejectKey("riktigGrunnbeløp", "grunnbeløpGjelderFra")
                 it.requireKey("system_participating_services")
             }
         }.register(this)
@@ -18,7 +19,7 @@ class IdentifiserFeilGrunnbeløpRiver(rapidsConnection: RapidsConnection, privat
             return context.sendPåSlack(packet, ERROR, "Det er identifisert sykefraværstilfeller med feil grunnbeløp. Har må noen ta en ørlitten titt.")
         }
 
-        if (packet["@event_name"].asText() == "identifiser_feil_grunnbeløp") {
+        if (packet["@event_name"].asText() == "kjør_grunnbeløpsregulering") {
             return context.sendPåSlack(packet, INFO, "Alle sykefraværstilfeller har rett grunnbeløp. Bare å lene seg tilbake å njuta.")
         }
     }
