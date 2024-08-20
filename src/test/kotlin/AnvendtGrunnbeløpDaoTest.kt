@@ -33,13 +33,13 @@ class AnvendtGrunnbeløpDaoTest {
             aktørId = "1A",
             personidentifikator = "1B",
             skjæringstidspunkt = LocalDate.parse("2018-01-01"),
-            `6G`= 123123.3
+            `6G`= SeksG(600_000)
         )
         val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
             aktørId = "2A",
             personidentifikator = "2B",
             skjæringstidspunkt = LocalDate.parse("2018-01-01"),
-            `6G`= 123123.3
+            `6G`= SeksG(600_000)
         )
         dao.lagre(anvendtGrunnbeløp1)
         assertEquals(listOf(anvendtGrunnbeløp1), hentAlle())
@@ -49,21 +49,21 @@ class AnvendtGrunnbeløpDaoTest {
 
     @Test
     fun `finner feilanvendte grunnbeløp`() {
-        val riktigGrunnbeløp = 200_000.0
-        val feilGrunnbeløp = 250_000.0
+        val riktigGrunnbeløp = 150_000.0
+        val feilGrunnbeløp = 300_000.0
         val grunnbeløpGjelderFra = LocalDate.parse("2018-01-01")
 
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
             aktørId = "1A",
             personidentifikator = "1B",
             skjæringstidspunkt = grunnbeløpGjelderFra,
-            `6G`= riktigGrunnbeløp * 6
+            `6G`= SeksG.fraGrunnbeløp(riktigGrunnbeløp)
         )
         val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
             aktørId = "2A",
             personidentifikator = "2B",
             skjæringstidspunkt = grunnbeløpGjelderFra,
-            `6G`= feilGrunnbeløp * 6
+            `6G`= SeksG.fraGrunnbeløp(feilGrunnbeløp)
         )
         dao.lagre(anvendtGrunnbeløp1)
         dao.lagre(anvendtGrunnbeløp2)
@@ -71,7 +71,7 @@ class AnvendtGrunnbeløpDaoTest {
         val feilanvendteGrunnbeløp = dao.hentFeilanvendteGrunnbeløp(
             grunnbeløpGjelderFra,
             LocalDate.of(9999, 1, 1),
-            riktigGrunnbeløp
+            SeksG.fraGrunnbeløp(riktigGrunnbeløp)
         )
         assertEquals(listOf(anvendtGrunnbeløp2), feilanvendteGrunnbeløp)
     }
@@ -82,9 +82,9 @@ class AnvendtGrunnbeløpDaoTest {
             aktørId = "1A",
             personidentifikator = "1B",
             skjæringstidspunkt = LocalDate.parse("2018-01-01"),
-            `6G`= 123123.3
+            `6G`= SeksG(600_000)
         )
-        val anvendtGrunnbeløp2 = anvendtGrunnbeløp1.copy(`6G`= 222222.0)
+        val anvendtGrunnbeløp2 = anvendtGrunnbeløp1.copy(`6G`= SeksG(600_000))
 
         dao.lagre(anvendtGrunnbeløp1)
         assertEquals(listOf(anvendtGrunnbeløp1), hentAlle())
@@ -100,13 +100,13 @@ class AnvendtGrunnbeløpDaoTest {
             aktørId = "1A",
             personidentifikator = personidentifikator,
             skjæringstidspunkt = skjæringstidspunkt,
-            `6G`= 123123.3
+            `6G`= SeksG(600_000)
         )
         val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
             aktørId = "1A",
             personidentifikator = personidentifikator,
             skjæringstidspunkt = LocalDate.parse("2019-01-01"),
-            `6G`= 123123.3
+            `6G`= SeksG(600_000)
         )
         dao.lagre(anvendtGrunnbeløp1)
         dao.lagre(anvendtGrunnbeløp2)
@@ -119,13 +119,13 @@ class AnvendtGrunnbeløpDaoTest {
     @Test
     fun `er det noen sykefraværstilfeller med feil grunnbeløp`() {
         assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
-        dao.lagre(1_000_000.0, LocalDate.parse("2018-05-01"))
-        dao.lagre(1_000_000.0, LocalDate.parse("2019-04-30"))
+        dao.lagre(1_200_000.0, LocalDate.parse("2018-05-01"))
+        dao.lagre(1_200_000.0, LocalDate.parse("2019-04-30"))
         assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
-        dao.lagre(2_000_000.0, LocalDate.parse("2019-05-01"))
-        dao.lagre(2_000_000.0, LocalDate.parse("2020-04-30"))
+        dao.lagre(2_400_000.0, LocalDate.parse("2019-05-01"))
+        dao.lagre(2_400_000.0, LocalDate.parse("2020-04-30"))
         assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
-        dao.lagre(1_000_000.0, LocalDate.parse("2020-01-01"))
+        dao.lagre(1_200_000.0, LocalDate.parse("2020-01-01"))
         assertTrue(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
     }
 
@@ -135,7 +135,7 @@ class AnvendtGrunnbeløpDaoTest {
                 aktørId = it.string("aktor_id"),
                 personidentifikator = it.string("personidentifikator"),
                 skjæringstidspunkt = it.localDate("skjaeringstidspunkt"),
-                `6G` = it.double("seks_g"),
+                `6G` = SeksG(it.double("seks_g")),
             ) }.asList)
         }
     }
@@ -145,7 +145,7 @@ class AnvendtGrunnbeløpDaoTest {
             aktørId = "1",
             personidentifikator = "2",
             skjæringstidspunkt = skjæringstidspunkt,
-            `6G`= seksG
+            `6G`= SeksG(seksG)
         ))
     }
 }

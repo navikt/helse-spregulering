@@ -9,7 +9,7 @@ class KjørGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, priva
             validate {
                 it.demandValue("@event_name", "kjør_grunnbeløpsregulering")
                 it.require("grunnbeløpGjelderFra") { grunnbeløpGjelderFra -> LocalDate.parse(grunnbeløpGjelderFra.asText()) }
-                it.require("riktigGrunnbeløp") { riktigGrunnbeløp -> check(riktigGrunnbeløp.asDouble() > 100_000.0 && riktigGrunnbeløp.asDouble() < 600_000.0) }
+                it.require("riktigGrunnbeløp") { riktigGrunnbeløp -> SeksG.fraGrunnbeløp(riktigGrunnbeløp.asDouble()) }
                 it.interestedIn("grunnbeløpGjelderTil") { grunnbeløpGjelderTil -> LocalDate.parse(grunnbeløpGjelderTil.asText()) }
             }
         }.register(this)
@@ -17,8 +17,8 @@ class KjørGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, priva
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val grunnbeløpGjelderFra = packet["grunnbeløpGjelderFra"].asLocalDate()
         val grunnbeløpGjelderTil = packet["grunnbeløpGjelderTil"].takeUnless { it.isMissingOrNull() }?.asLocalDate() ?: LocalDate.MAX
-        val rikitgGrunnbeløp = packet["riktigGrunnbeløp"].asDouble()
-        val feilanvendteGrunnbeløp = anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra, grunnbeløpGjelderTil, rikitgGrunnbeløp)
+        val rikitgSeksG = SeksG.fraGrunnbeløp(packet["riktigGrunnbeløp"].asDouble())
+        val feilanvendteGrunnbeløp = anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra, grunnbeløpGjelderTil, rikitgSeksG)
         sikkerlogg.info("Grunnbeløpsregulerer ${feilanvendteGrunnbeløp.size} sykefraværstilfeller:\n\t${packet.toJson()}")
         feilanvendteGrunnbeløp.forEach {
             val grunnbeløpsreguleringEvent = it.toGrunnbeløpsreguleringEvent()

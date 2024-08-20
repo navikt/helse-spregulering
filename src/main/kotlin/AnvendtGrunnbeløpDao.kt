@@ -18,7 +18,7 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
                 "aktor_id" to anvendtGrunnbeløpDto.aktørId,
                 "personidentifikator" to anvendtGrunnbeløpDto.personidentifikator,
                 "skjaeringstidspunkt" to anvendtGrunnbeløpDto.skjæringstidspunkt,
-                "seks_g" to anvendtGrunnbeløpDto.`6G`
+                "seks_g" to anvendtGrunnbeløpDto.`6G`.verdi
             )).asExecute)
         }
     }
@@ -26,9 +26,8 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
     fun hentFeilanvendteGrunnbeløp(
         grunnbeløpGjelderFra: LocalDate,
         grunnbeløpGjelderTil: LocalDate,
-        riktigGrunnbeløp: Double
+        riktigSeksG: SeksG
     ): List<AnvendtGrunnbeløpDto> {
-        val riktigSeksG = riktigGrunnbeløp * 6
         @Language("PostgreSQL")
         val statement = """
             SELECT * FROM anvendt_grunnbeloep
@@ -40,12 +39,12 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
             session.run(queryOf(statement, mapOf(
                 "grunnbeloep_gjelder_fra" to grunnbeløpGjelderFra.postgresifiser,
                 "grunnbeloep_gjelder_til" to grunnbeløpGjelderTil.postgresifiser,
-                "riktig_seks_g" to riktigSeksG
+                "riktig_seks_g" to riktigSeksG.verdi
             )).map { AnvendtGrunnbeløpDto(
                 aktørId = it.string("aktor_id"),
                 personidentifikator = it.string("personidentifikator"),
                 skjæringstidspunkt = it.localDate("skjaeringstidspunkt"),
-                `6G` = it.double("seks_g"),
+                `6G` = SeksG(it.double("seks_g")),
             ) }.asList)
         }
     }

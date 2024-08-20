@@ -25,7 +25,7 @@ class UtkastTilVedtakRiver(
             aktørId = packet["aktørId"].asText(),
             personidentifikator = packet["fødselsnummer"].asText(),
             skjæringstidspunkt = packet["skjæringstidspunkt"].asLocalDate(),
-            `6G` = packet["sykepengegrunnlagsfakta.6G"].asDouble()
+            `6G` = SeksG(packet["sykepengegrunnlagsfakta.6G"].asDouble())
         )
         anvendtGrunnbeløpDao.lagre(anvendtGrunnbeløpDto)
     }
