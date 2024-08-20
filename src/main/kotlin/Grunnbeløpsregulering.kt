@@ -1,0 +1,76 @@
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.isMissingOrNull
+import org.slf4j.LoggerFactory
+
+class Grunnbeløpsregulering(
+    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
+    private val context: MessageContext,
+    packet: JsonMessage
+) {
+    private val event = packet["@event_name"].asText()
+    private val manueltInitiert = event == "kjør_grunnbeløpsregulering" && packet["riktigGrunnbeløp"].isMissingOrNull()
+    private val systemParticipatingServices = packet["system_participating_services"]
+    private val skalReguleres = mutableMapOf<Periode, SeksG>()
+
+    fun leggTil(periode: Periode, riktigSeksG: SeksG): Grunnbeløpsregulering {
+        check(skalReguleres[periode] == null) { "Hei! dette går ikke an! $periode er allerede lagt til." }
+        skalReguleres[periode] = riktigSeksG
+        return this
+    }
+
+    fun regulér() {
+        loggStart()
+
+        val meldingslinjer = mutableListOf<String>()
+
+        skalReguleres.forEach { (periode, riktigSeksG) ->
+            val feilanvendteGrunnbeløp = anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(periode, riktigSeksG)
+
+            if (feilanvendteGrunnbeløp.isNotEmpty()) {
+                meldingslinjer.add("- Sendt ut grunnbeløpsregulering for ${feilanvendteGrunnbeløp.size} sykefraværstilfeller med skjæringstidspunkt i perioden $periode som ikke hadde 6G $riktigSeksG (grunnbeløp ${riktigSeksG.verdi / 6})")
+            }
+
+            feilanvendteGrunnbeløp.forEach { feilanvendtGrunnbeløp ->
+                val grunnbeløpsreguleringEvent = feilanvendtGrunnbeløp.toGrunnbeløpsreguleringEvent()
+                sikkerlogg.info("Sender grunnbeløpsregulering:\n\t${grunnbeløpsreguleringEvent}")
+                context.publish(feilanvendtGrunnbeløp.personidentifikator, grunnbeløpsreguleringEvent)
+            }
+        }
+
+        val melding = meldingslinjer.melding() ?: return
+        sikkerlogg.info(melding)
+        context.sendPåSlack(melding)
+    }
+
+    private fun loggStart() {
+        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering for periodene ${skalReguleres.keys.joinToString()}")
+        sikkerlogg.info("Starter automatisk grunnbeløpsregulering for periodene ${skalReguleres.keys.joinToString()}")
+    }
+
+    private fun List<String>.melding(): String? {
+        if (isNotEmpty()) return joinToString("\n")
+        if (manueltInitiert) return "Alle sykefraværstilfeller har rett grunnbeløp. Bare å lene seg tilbake å njuta."
+        return null
+    }
+
+    private fun MessageContext.sendPåSlack(melding: String) {
+        val slackmelding = JsonMessage.newMessage("slackmelding", mapOf(
+            "melding" to "\n\n$melding\n\n - Deres erbødig SPregulering :money:",
+            "level" to "INFO",
+            "system_participating_services" to systemParticipatingServices
+        )).toJson()
+
+        publish(slackmelding)
+    }
+
+    private companion object {
+        private val sikkerlogg = LoggerFactory.getLogger("tjenestekall")
+
+        private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() = JsonMessage.newMessage("grunnbeløpsregulering", mapOf(
+            "fødselsnummer" to personidentifikator,
+            "aktørId" to aktørId,
+            "skjæringstidspunkt" to skjæringstidspunkt
+        )).toJson()
+    }
+}
