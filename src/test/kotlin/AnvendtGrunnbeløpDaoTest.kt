@@ -117,15 +117,31 @@ class AnvendtGrunnbeløpDaoTest {
 
     @Test
     fun `er det noen sykefraværstilfeller med feil grunnbeløp`() {
-        assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        assertEquals(emptyMap<Periode, SeksG>(), dao.perioderMedForskjelligGrunnbeløp())
         dao.lagre(1_200_000.0, LocalDate.parse("2018-05-01"))
         dao.lagre(1_200_000.0, LocalDate.parse("2019-04-30"))
-        assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        assertEquals(emptyMap<Periode, SeksG>(), dao.perioderMedForskjelligGrunnbeløp())
         dao.lagre(2_400_000.0, LocalDate.parse("2019-05-01"))
         dao.lagre(2_400_000.0, LocalDate.parse("2020-04-30"))
-        assertFalse(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        assertEquals(emptyMap<Periode, SeksG>(), dao.perioderMedForskjelligGrunnbeløp())
         dao.lagre(1_200_000.0, LocalDate.parse("2020-01-01"))
-        assertTrue(dao.erDetNoenSykefraværstilfellerMedFeilGrunnbeløp())
+        dao.lagre(2_400_000.0, LocalDate.parse("2020-01-02"))
+        val forventetPerioderMedForskjelligeGrunnbeløp = mapOf(
+            Periode(LocalDate.parse("2019-05-01"), LocalDate.parse("2020-01-01")) to SeksG(2_400_000)
+        )
+        assertEquals(forventetPerioderMedForskjelligeGrunnbeløp, dao.perioderMedForskjelligGrunnbeløp())
+        dao.lagre(2_400_000.0, LocalDate.parse("2020-01-01"))
+        assertEquals(emptyMap<Periode, SeksG>(), dao.perioderMedForskjelligGrunnbeløp())
+    }
+
+    @Test
+    fun `dagens bilde`() {
+        assertEquals(emptyMap<Periode, SeksG>(), dao.perioderMedForskjelligGrunnbeløp())
+        dao.lagre(711_720.0, LocalDate.parse("2023-05-01"))
+        dao.lagre(711_720.0, LocalDate.parse("2024-04-30"))
+        dao.lagre(744_168.0, LocalDate.parse("2024-05-01"))
+        dao.lagre(744_168.0, LocalDate.parse("2024-08-19"))
+        assertEquals(emptyMap<Periode, SeksG>(), dao.perioderMedForskjelligGrunnbeløp())
     }
 
     private fun hentAlle(): List<AnvendtGrunnbeløpDto> {

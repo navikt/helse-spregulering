@@ -38,19 +38,20 @@ class Grunnbeløpsregulering(
             }
         }
 
-        val melding = meldingslinjer.melding() ?: return
+        val melding = meldingslinjer.melding() ?: return sikkerlogg.info(Gladmelding)
+
         sikkerlogg.info(melding)
         context.sendPåSlack(melding)
     }
 
     private fun loggStart() {
-        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering for periodene ${skalReguleres.keys.joinToString()}")
+        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering fra eventet $event for periodene ${skalReguleres.keys.joinToString()}")
         sikkerlogg.info("Starter automatisk grunnbeløpsregulering for periodene ${skalReguleres.keys.joinToString()}")
     }
 
     private fun List<String>.melding(): String? {
         if (isNotEmpty()) return joinToString("\n")
-        if (manueltInitiert) return "Alle sykefraværstilfeller har rett grunnbeløp. Bare å lene seg tilbake å njuta."
+        if (manueltInitiert) return Gladmelding
         return null
     }
 
@@ -66,6 +67,7 @@ class Grunnbeløpsregulering(
 
     private companion object {
         private val sikkerlogg = LoggerFactory.getLogger("tjenestekall")
+        private const val Gladmelding = "Alle sykefraværstilfeller har rett grunnbeløp. Bare å lene seg tilbake å njuta."
 
         private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() = JsonMessage.newMessage("grunnbeløpsregulering", mapOf(
             "fødselsnummer" to personidentifikator,

@@ -5,7 +5,12 @@ Sparker i gang G-regulering på alle perioder som har lagt feil G til grunn når
 
 ## Sånn her G-regulerer man
 
-Å nei, har du blitt valgt ut til å kjøre årets G-regulering? Det pleide å være leit, men nå er det blitt ganske greit: 
+Å nei, har du blitt valgt ut til å kjøre årets G-regulering? Det pleide å være leit, men nå er det blitt ganske greit.
+Fordi det skjer automatisk 🥳
+
+Det er allikevel mulig å sparke det igang manuelt om man ikke vil vente på automatikken. 
+
+F.eks. om vi får nytt grunnbeløp for 2025 lagt til i Spleis 20.Mai vil ikke automatikken slå inn før det er kommet et `utkast_til_vedtak` med nytt grunnbeløp & skjæringstidspunkt 1.Mai 2025. Det er stor sannsynlighet for at det skjer i løpet av såpass kort tid at det ikke er verdt å gjøre noe manuelt. Men du kan allikevel gjøre det:
 
 1. Gå til spout.intern.nav.no og velg deg malen *Reguler G for alle som trenger*. Fyll ut riktig verdier og send eventet. Nå henter spregulering frem alle personer med feil G og sender ut et G-reguleringsevent til spleis.
 2. Sjekk om det er fortsatt er noen som ikke har blitt G-regulert. Det kan du sjekke ved å spørre databasen veldig pent: 

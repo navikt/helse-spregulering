@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -45,6 +46,14 @@ class SeksGTest {
         }
     }
 
+    @Test
+    fun `sammenligne 6G`() {
+        assertTrue(seksGFor(2019) < seksGFor(2020))
+        assertTrue(seksGFor(2021) > seksGFor(2020))
+        assertEquals(0, seksGFor(2024).compareTo(seksGFor(2024)))
+    }
+
+
     private companion object {
         private val KjenteGrunnbeløp = mapOf(
             2019 to 99858.0,
@@ -54,5 +63,6 @@ class SeksGTest {
             2023 to 118620.0,
             2024 to 124028.0
         )
+        private fun seksGFor(år: Int) = SeksG.fraGrunnbeløp(KjenteGrunnbeløp.getValue(år))
     }
 }

@@ -9,7 +9,7 @@ class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, Iterable<
         require(start <= endInclusive) { "fom ($start) kan ikke være etter tom ($endInclusive)" }
     }
 
-    private fun overlapperMed(other: Periode) = overlappendePeriode(other) != null
+    internal fun overlapperMed(other: Periode) = overlappendePeriode(other) != null
 
     private fun overlappendePeriode(other: Periode): Periode? {
         val start = maxOf(this.start, other.start)

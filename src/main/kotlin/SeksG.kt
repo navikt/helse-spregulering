@@ -1,5 +1,5 @@
 
-class SeksG(input: Number) {
+class SeksG(input: Number): Comparable<SeksG> {
     val verdi = input.toDouble()
     init {
         require(verdi % 6 == 0.0 && verdi in grense) {
@@ -8,6 +8,7 @@ class SeksG(input: Number) {
     }
 
     override fun toString() = "$verdi"
+    override fun compareTo(other: SeksG) = this.verdi.compareTo(other.verdi)
     override fun equals(other: Any?) = other is SeksG && verdi == other.verdi
     override fun hashCode() = verdi.hashCode()
 

@@ -63,20 +63,24 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         }
     }
 
-    fun erDetNoenSykefraværstilfellerMedFeilGrunnbeløp(): Boolean {
+    fun perioderMedForskjelligGrunnbeløp(): Map<Periode, SeksG> {
         @Language("PostgreSQL")
         val statement = """
             SELECT * FROM seks_g
             WHERE seks_g >= $SeksG2023
         """
-        val perioderMedUnikeGrunnbeløp = sessionOf(dataSource).use { session ->
+        val grunnbeløp = sessionOf(dataSource).use { session ->
             session.run(queryOf(statement).map { row ->
-                Periode(row.localDate("tidligste_skjaeringstidspunkt"), row.localDate("seneste_skjaeringstidspunkt"))
-            }.asList)
+                val periode = Periode(row.localDate("tidligste_skjaeringstidspunkt"), row.localDate("seneste_skjaeringstidspunkt"))
+                val seksG = SeksG(row.double("seks_g"))
+                seksG to periode
+            }.asList).toMap()
         }
 
-        // Om vi finner overlappende perioder på tvers av grunnbeløp så tyder det på at vi har brukt feil grunnbeløp
-        return perioderMedUnikeGrunnbeløp.overlappendePerioder().isNotEmpty()
+        // Finner alle perioder som har forskjellig grunnbeløp og kobler de mot det største grunnbeløpet, som det er naturlig å tro at er det riktige.
+        return grunnbeløp.values.overlappendePerioder().associateWith { periodeMedForskjelligeGrunnbeløp ->
+            grunnbeløp.filterValues { periodeMedForskjelligeGrunnbeløp.overlapperMed(it) }.maxOf { (seksG, _) -> seksG }
+        }
     }
 
     private companion object {
