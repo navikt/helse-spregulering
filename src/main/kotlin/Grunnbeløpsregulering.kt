@@ -45,8 +45,9 @@ class Grunnbeløpsregulering(
     }
 
     private fun loggStart() {
-        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering fra eventet $event for periodene ${skalReguleres.keys.joinToString()}")
-        sikkerlogg.info("Starter automatisk grunnbeløpsregulering for periodene ${skalReguleres.keys.joinToString()}")
+        val periodene = if (skalReguleres.keys.isEmpty()) "- men det var ingen perioder å regulere, gitt." else "for periodene ${skalReguleres.keys.joinToString()}"
+        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering fra eventet $event $periodene")
+        sikkerlogg.info("Starter automatisk grunnbeløpsregulering $periodene")
     }
 
     private fun List<String>.melding(): String? {
