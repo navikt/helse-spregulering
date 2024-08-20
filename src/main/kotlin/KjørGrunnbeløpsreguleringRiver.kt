@@ -10,15 +10,22 @@ class KjørGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, priva
                 it.demandValue("@event_name", "kjør_grunnbeløpsregulering")
                 it.require("grunnbeløpGjelderFra") { grunnbeløpGjelderFra -> LocalDate.parse(grunnbeløpGjelderFra.asText()) }
                 it.require("riktigGrunnbeløp") { riktigGrunnbeløp -> SeksG.fraGrunnbeløp(riktigGrunnbeløp.asDouble()) }
-                it.interestedIn("grunnbeløpGjelderTil") { grunnbeløpGjelderTil -> LocalDate.parse(grunnbeløpGjelderTil.asText()) }
+                it.interestedIn("grunnbeløpGjelderTil") { grunnbeløpGjelderTil ->
+                    val fom = it["grunnbeløpGjelderFra"].asLocalDate()
+                    val tom = LocalDate.parse(grunnbeløpGjelderTil.asText())
+                    Periode(fom, tom)
+                }
             }
         }.register(this)
     }
+
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val grunnbeløpGjelderFra = packet["grunnbeløpGjelderFra"].asLocalDate()
         val grunnbeløpGjelderTil = packet["grunnbeløpGjelderTil"].takeUnless { it.isMissingOrNull() }?.asLocalDate() ?: LocalDate.MAX
+        val periode = Periode(grunnbeløpGjelderFra, grunnbeløpGjelderTil)
         val rikitgSeksG = SeksG.fraGrunnbeløp(packet["riktigGrunnbeløp"].asDouble())
-        val feilanvendteGrunnbeløp = anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(grunnbeløpGjelderFra, grunnbeløpGjelderTil, rikitgSeksG)
+
+        val feilanvendteGrunnbeløp = anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(periode, rikitgSeksG)
         sikkerlogg.info("Grunnbeløpsregulerer ${feilanvendteGrunnbeløp.size} sykefraværstilfeller:\n\t${packet.toJson()}")
         feilanvendteGrunnbeløp.forEach {
             val grunnbeløpsreguleringEvent = it.toGrunnbeløpsreguleringEvent()

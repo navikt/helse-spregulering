@@ -24,8 +24,7 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
     }
 
     fun hentFeilanvendteGrunnbeløp(
-        grunnbeløpGjelderFra: LocalDate,
-        grunnbeløpGjelderTil: LocalDate,
+        periode: Periode,
         riktigSeksG: SeksG
     ): List<AnvendtGrunnbeløpDto> {
         @Language("PostgreSQL")
@@ -37,8 +36,8 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         """
         return sessionOf(dataSource).use { session ->
             session.run(queryOf(statement, mapOf(
-                "grunnbeloep_gjelder_fra" to grunnbeløpGjelderFra.postgresifiser,
-                "grunnbeloep_gjelder_til" to grunnbeløpGjelderTil.postgresifiser,
+                "grunnbeloep_gjelder_fra" to periode.start.postgresifiser,
+                "grunnbeloep_gjelder_til" to periode.endInclusive.postgresifiser,
                 "riktig_seks_g" to riktigSeksG.verdi
             )).map { AnvendtGrunnbeløpDto(
                 aktørId = it.string("aktor_id"),

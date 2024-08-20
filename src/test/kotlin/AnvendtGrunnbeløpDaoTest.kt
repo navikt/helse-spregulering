@@ -69,8 +69,7 @@ class AnvendtGrunnbeløpDaoTest {
         dao.lagre(anvendtGrunnbeløp2)
 
         val feilanvendteGrunnbeløp = dao.hentFeilanvendteGrunnbeløp(
-            grunnbeløpGjelderFra,
-            LocalDate.of(9999, 1, 1),
+            Periode(grunnbeløpGjelderFra, LocalDate.MAX),
             SeksG.fraGrunnbeløp(riktigGrunnbeløp)
         )
         assertEquals(listOf(anvendtGrunnbeløp2), feilanvendteGrunnbeløp)

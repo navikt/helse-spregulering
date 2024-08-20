@@ -1,6 +1,6 @@
 import java.time.LocalDate
 
-internal class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, Iterable<LocalDate> {
+class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, Iterable<LocalDate> {
 
     override val start: LocalDate = fom
     override val endInclusive: LocalDate = tom
