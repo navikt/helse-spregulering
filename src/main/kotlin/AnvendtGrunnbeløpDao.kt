@@ -1,4 +1,4 @@
-import Periode.Companion.overlapper
+import Periode.Companion.overlappendePerioder
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.intellij.lang.annotations.Language
@@ -78,7 +78,7 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         }
 
         // Om vi finner overlappende perioder på tvers av grunnbeløp så tyder det på at vi har brukt feil grunnbeløp
-        return perioderMedUnikeGrunnbeløp.overlapper()
+        return perioderMedUnikeGrunnbeløp.overlappendePerioder().isNotEmpty()
     }
 
     private companion object {

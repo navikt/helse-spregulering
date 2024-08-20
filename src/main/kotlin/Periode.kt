@@ -9,7 +9,7 @@ internal class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, 
         require(start <= endInclusive) { "fom ($start) kan ikke være etter tom ($endInclusive)" }
     }
 
-    internal fun overlapperMed(other: Periode) = overlappendePeriode(other) != null
+    private fun overlapperMed(other: Periode) = overlappendePeriode(other) != null
 
     private fun overlappendePeriode(other: Periode): Periode? {
         val start = maxOf(this.start, other.start)
@@ -43,10 +43,13 @@ internal class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, 
     }
 
     override fun equals(other: Any?) = other is Periode && this.start == other.start && this.endInclusive == other.endInclusive
+
     override fun hashCode() = start.hashCode() * 37 + endInclusive.hashCode()
 
-    internal companion object {
-        internal fun Iterable<Periode>.grupperSammenhengendePerioder(): List<Periode> {
+    override fun toString() = "$start - $endInclusive"
+
+    companion object {
+        private fun Iterable<Periode>.gruppérSammenhengendePerioder(): List<Periode> {
             val resultat = mutableListOf<Periode>()
             val sortert = sortedBy { it.start }
             sortert.forEachIndexed { index, periode ->
@@ -56,6 +59,14 @@ internal class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, 
                 })
             }
             return resultat
+        }
+
+        fun Iterable<Periode>.overlappendePerioder(): List<Periode> {
+            val overlapp = mutableSetOf<Periode>()
+            sortedBy { it.start }.zipWithNext { nåværende, neste ->
+                nåværende.overlappendePeriode(neste)?.let { overlapp.add(it) }
+            }
+            return overlapp.gruppérSammenhengendePerioder()
         }
     }
 }
