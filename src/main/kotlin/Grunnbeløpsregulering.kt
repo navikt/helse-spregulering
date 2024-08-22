@@ -1,6 +1,5 @@
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.isMissingOrNull
 import org.slf4j.LoggerFactory
 
 class Grunnbeløpsregulering(
@@ -8,8 +7,7 @@ class Grunnbeløpsregulering(
     private val context: MessageContext,
     packet: JsonMessage
 ) {
-    private val event = packet["@event_name"].asText()
-    private val manueltInitiert = event == "kjør_grunnbeløpsregulering" && packet["riktigGrunnbeløp"].isMissingOrNull()
+    private val manueltInitiert = packet["@event_name"].asText() == "kjør_grunnbeløpsregulering"
     private val systemParticipatingServices = packet["system_participating_services"]
     private val skalReguleres = mutableMapOf<Periode, SeksG>()
 
@@ -46,7 +44,7 @@ class Grunnbeløpsregulering(
 
     private fun loggStart() {
         val periodene = if (skalReguleres.keys.isEmpty()) "- men det var ingen perioder å regulere, gitt." else "for periodene ${skalReguleres.keys.joinToString()}"
-        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering fra eventet $event $periodene")
+        if (manueltInitiert) return sikkerlogg.info("Starter manuell grunnbeløpsregulering $periodene")
         sikkerlogg.info("Starter automatisk grunnbeløpsregulering $periodene")
     }
 

@@ -1,6 +1,8 @@
 import com.github.navikt.tbd_libs.test_support.CleanupStrategy
 import com.github.navikt.tbd_libs.test_support.DatabaseContainers
 import com.github.navikt.tbd_libs.test_support.TestDataSource
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.junit.jupiter.api.AfterEach
@@ -76,19 +78,34 @@ class AnvendtGrunnbeløpDaoTest {
     }
 
     @Test
-    fun `oppdaterer sykefraværstilfelle ved ny g`() {
+    fun `oppdaterer sykefraværstilfelle ved ny g`() = runBlocking {
+        val skjæringstidspunkt = LocalDate.parse("2018-01-01")
+        val personidentifikator = "1B"
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
             aktørId = "1A",
-            personidentifikator = "1B",
-            skjæringstidspunkt = LocalDate.parse("2018-01-01"),
+            personidentifikator = personidentifikator,
+            skjæringstidspunkt = skjæringstidspunkt,
             `6G`= SeksG(600_000)
         )
-        val anvendtGrunnbeløp2 = anvendtGrunnbeløp1.copy(`6G`= SeksG(600_000))
+        val anvendtGrunnbeløp2 = anvendtGrunnbeløp1.copy(`6G`= SeksG(660_000))
 
         dao.lagre(anvendtGrunnbeløp1)
         assertEquals(listOf(anvendtGrunnbeløp1), hentAlle())
+        val oppdatert1 = oppdatert(personidentifikator, skjæringstidspunkt)
+
+        delay(1)
         dao.lagre(anvendtGrunnbeløp2)
         assertEquals(listOf(anvendtGrunnbeløp2), hentAlle())
+        val oppdatert2 = oppdatert(personidentifikator, skjæringstidspunkt)
+        assertNotEquals(oppdatert1, oppdatert2)
+
+        delay(1)
+        dao.lagre(anvendtGrunnbeløp2)
+        assertEquals(listOf(anvendtGrunnbeløp2), hentAlle())
+        val oppdatert3 = oppdatert(personidentifikator, skjæringstidspunkt)
+
+        assertNotEquals(oppdatert2, oppdatert3)
+        //assertEquals(oppdatert2, oppdatert3)
     }
 
     @Test
@@ -153,6 +170,10 @@ class AnvendtGrunnbeløpDaoTest {
                 `6G` = SeksG(it.double("seks_g")),
             ) }.asList)
         }
+    }
+
+    private fun oppdatert(personidentifikator: String, skjæringstidspunkt: LocalDate) = sessionOf(dataSource).use { session ->
+        session.run(queryOf("SELECT oppdatert FROM anvendt_grunnbeloep WHERE personidentifikator = '$personidentifikator' AND skjaeringstidspunkt = '$skjæringstidspunkt'").map { it.localDateTime("oppdatert") }.asSingle)!!
     }
 
     private fun AnvendtGrunnbeløpDao.lagre(seksG: Double, skjæringstidspunkt: LocalDate) {
