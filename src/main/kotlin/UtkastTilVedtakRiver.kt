@@ -11,7 +11,7 @@ class UtkastTilVedtakRiver(
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "utkast_til_vedtak")
-                it.requireKey("sykepengegrunnlagsfakta.6G", "aktørId", "fødselsnummer", "@id")
+                it.requireKey("sykepengegrunnlagsfakta.6G", "aktørId", "fødselsnummer")
                 it.require("skjæringstidspunkt") { skjæringstidspunkt ->
                     val dato = LocalDate.parse(skjæringstidspunkt.asText())
                     check(dato >= Virkningsdato2020Grunnbeløp)
@@ -20,8 +20,6 @@ class UtkastTilVedtakRiver(
         }.register(this)
     }
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val poisonpill = packet["@id"].asText() == "e7205aaa-5a91-4922-a11d-a320fa7d18c5"
-        if (poisonpill) return sikkerlogg.info("Her er det best å holde seg unna, ellers takk!")
         sikkerlogg.info("Lagrer nytting data til potensiell G-regulering:\n\t${packet.toJson()}")
         val anvendtGrunnbeløpDto = AnvendtGrunnbeløpDto(
             aktørId = packet["aktørId"].asText(),
