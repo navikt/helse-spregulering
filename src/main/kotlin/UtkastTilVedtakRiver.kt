@@ -11,7 +11,7 @@ class UtkastTilVedtakRiver(
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "utkast_til_vedtak")
-                it.requireKey("sykepengegrunnlagsfakta.6G", "aktørId", "fødselsnummer")
+                it.requireKey("sykepengegrunnlagsfakta.6G", "aktørId", "fødselsnummer", "@id")
                 it.require("skjæringstidspunkt") { skjæringstidspunkt ->
                     val dato = LocalDate.parse(skjæringstidspunkt.asText())
                     check(dato >= Virkningsdato2020Grunnbeløp)
