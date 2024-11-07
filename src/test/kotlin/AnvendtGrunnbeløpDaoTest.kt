@@ -32,13 +32,11 @@ class AnvendtGrunnbeløpDaoTest {
     @Test
     fun `lagrer anvendte grunnbeløp`() {
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
-            aktørId = "1A",
             personidentifikator = "1B",
             skjæringstidspunkt = LocalDate.parse("2018-01-01"),
             `6G`= SeksG(600_000)
         )
         val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
-            aktørId = "2A",
             personidentifikator = "2B",
             skjæringstidspunkt = LocalDate.parse("2018-01-01"),
             `6G`= SeksG(600_000)
@@ -56,13 +54,11 @@ class AnvendtGrunnbeløpDaoTest {
         val grunnbeløpGjelderFra = LocalDate.parse("2018-01-01")
 
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
-            aktørId = "1A",
             personidentifikator = "1B",
             skjæringstidspunkt = grunnbeløpGjelderFra,
             `6G`= SeksG.fraGrunnbeløp(riktigGrunnbeløp)
         )
         val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
-            aktørId = "2A",
             personidentifikator = "2B",
             skjæringstidspunkt = grunnbeløpGjelderFra,
             `6G`= SeksG.fraGrunnbeløp(feilGrunnbeløp)
@@ -82,7 +78,6 @@ class AnvendtGrunnbeløpDaoTest {
         val skjæringstidspunkt = LocalDate.parse("2018-01-01")
         val personidentifikator = "1B"
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
-            aktørId = "1A",
             personidentifikator = personidentifikator,
             skjæringstidspunkt = skjæringstidspunkt,
             `6G`= SeksG(600_000)
@@ -113,13 +108,11 @@ class AnvendtGrunnbeløpDaoTest {
         val skjæringstidspunkt = LocalDate.parse("2018-01-01")
         val personidentifikator = "1B"
         val anvendtGrunnbeløp1 = AnvendtGrunnbeløpDto(
-            aktørId = "1A",
             personidentifikator = personidentifikator,
             skjæringstidspunkt = skjæringstidspunkt,
             `6G`= SeksG(600_000)
         )
         val anvendtGrunnbeløp2 = AnvendtGrunnbeløpDto(
-            aktørId = "1A",
             personidentifikator = personidentifikator,
             skjæringstidspunkt = LocalDate.parse("2019-01-01"),
             `6G`= SeksG(600_000)
@@ -164,7 +157,6 @@ class AnvendtGrunnbeløpDaoTest {
     private fun hentAlle(): List<AnvendtGrunnbeløpDto> {
         return sessionOf(dataSource).use { session ->
             session.run(queryOf("SELECT * FROM anvendt_grunnbeloep").map { AnvendtGrunnbeløpDto(
-                aktørId = it.string("aktor_id"),
                 personidentifikator = it.string("personidentifikator"),
                 skjæringstidspunkt = it.localDate("skjaeringstidspunkt"),
                 `6G` = SeksG(it.double("seks_g")),
@@ -178,7 +170,6 @@ class AnvendtGrunnbeløpDaoTest {
 
     private fun AnvendtGrunnbeløpDao.lagre(seksG: Double, skjæringstidspunkt: LocalDate) {
         lagre(AnvendtGrunnbeløpDto(
-            aktørId = "1",
             personidentifikator = "2",
             skjæringstidspunkt = skjæringstidspunkt,
             `6G`= SeksG(seksG)

@@ -55,7 +55,6 @@ class UtkastTilVedtakRiverTest {
     private fun event(eventName: String, skjæringstidspunkt: String = "2024-01-01"): String = """{
         "@event_name": "$eventName",
         "fødselsnummer": "fødselsnummer",
-        "aktørId": "aktørId",
         "skjæringstidspunkt": "$skjæringstidspunkt",
         "sykepengegrunnlagsfakta": {
           "6G": 666666.0

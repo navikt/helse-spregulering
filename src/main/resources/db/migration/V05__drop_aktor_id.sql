@@ -1,0 +1,1 @@
+alter table anvendt_grunnbeloep drop column aktor_id;

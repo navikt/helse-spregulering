@@ -79,7 +79,7 @@ class SeksGViewTest {
     }
 
     private fun AnvendtGrunnbeløpDao.registrer(seksG: SeksG, skjæringstidspunkt: LocalDate) =
-        lagre(AnvendtGrunnbeløpDto(aktørId = "1", personidentifikator = "2", skjæringstidspunkt = skjæringstidspunkt, `6G`= seksG))
+        lagre(AnvendtGrunnbeløpDto(personidentifikator = "2", skjæringstidspunkt = skjæringstidspunkt, `6G`= seksG))
 
     private fun finnObservasjon(seksG: SeksG) = sessionOf(dataSource).use { session ->
         @Language("PostgreSQL")

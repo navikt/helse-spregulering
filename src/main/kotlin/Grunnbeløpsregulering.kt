@@ -70,7 +70,6 @@ class Grunnbeløpsregulering(
 
         private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() = JsonMessage.newMessage("grunnbeløpsregulering", mapOf(
             "fødselsnummer" to personidentifikator,
-            "aktørId" to aktørId,
             "skjæringstidspunkt" to skjæringstidspunkt
         )).toJson()
     }

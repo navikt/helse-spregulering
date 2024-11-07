@@ -18,7 +18,7 @@ class GrunnbeløpsreguleringRiverTest {
         AutomatiskGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
     }
     private val perioderMedFeilGrunnbeløp = mapOf(Periode(MIN, MIN) to SeksG(600_000), Periode(MAX, MAX) to SeksG(660_000))
-    private val feilanvendtGrunnbeløp = listOf(AnvendtGrunnbeløpDto("1", "2", LocalDate.parse("2018-01-01"), SeksG(720_000)))
+    private val feilanvendtGrunnbeløp = listOf(AnvendtGrunnbeløpDto("1", LocalDate.parse("2018-01-01"), SeksG(720_000)))
 
     @BeforeEach
     fun setup() {
