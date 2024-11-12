@@ -7,7 +7,7 @@ val flywayCoreVersion = "10.17.0"
 val postgresqlVersion = "42.7.3"
 val kotliqueryVersion = "1.9.0"
 val hikariCPVersion = "5.1.0"
-val junitJupiterVersion = "5.10.3"
+val junitJupiterVersion = "5.11.3"
 val tbdLibsVersion = "2024.05.31-08.02-2c3441c1"
 val mockkVersion = "1.13.12"
 
@@ -36,10 +36,10 @@ dependencies {
     implementation("org.postgresql:postgresql:$postgresqlVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testImplementation("com.github.navikt.tbd-libs:postgres-testdatabaser:$tbdLibsVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("io.mockk:mockk:$mockkVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks {
