@@ -2,13 +2,13 @@ plugins {
     kotlin("jvm") version "2.0.21"
 }
 
-val rapidsAndRiversVersion = "2024111211071731406062.648687519469"
+val rapidsAndRiversVersion = "2024111220531731441232.6f0a7a6c643b"
 val flywayCoreVersion = "10.17.0"
 val postgresqlVersion = "42.7.3"
 val kotliqueryVersion = "1.9.0"
 val hikariCPVersion = "5.1.0"
 val junitJupiterVersion = "5.11.3"
-val tbdLibsVersion = "2024.11.12-11.09-16cf2599"
+val tbdLibsVersion = "2024.11.12-20.46-e1fd6a25"
 val mockkVersion = "1.13.12"
 
 repositories {
