@@ -1,4 +1,9 @@
-import no.nav.helse.rapids_rivers.*
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 
 class AutomatiskGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
 
@@ -11,7 +16,7 @@ class AutomatiskGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, 
             }
         }.register(this)
     }
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         val grunnbeløpsregulering = Grunnbeløpsregulering(anvendtGrunnbeløpDao, context, packet)
 
         anvendtGrunnbeløpDao.perioderMedForskjelligGrunnbeløp().forEach { (periode, antattRiktigSeksG) ->

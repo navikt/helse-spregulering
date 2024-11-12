@@ -2,13 +2,13 @@ plugins {
     kotlin("jvm") version "2.0.21"
 }
 
-val rapidsAndRiversVersion = "2024061408021718344972.64ebbdb34321"
+val rapidsAndRiversVersion = "2024111211071731406062.648687519469"
 val flywayCoreVersion = "10.17.0"
 val postgresqlVersion = "42.7.3"
 val kotliqueryVersion = "1.9.0"
 val hikariCPVersion = "5.1.0"
 val junitJupiterVersion = "5.11.3"
-val tbdLibsVersion = "2024.05.31-08.02-2c3441c1"
+val tbdLibsVersion = "2024.11.12-11.09-16cf2599"
 val mockkVersion = "1.13.12"
 
 repositories {
@@ -37,6 +37,7 @@ dependencies {
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
 
     testImplementation("com.github.navikt.tbd-libs:postgres-testdatabaser:$tbdLibsVersion")
+    testImplementation("com.github.navikt.tbd-libs:rapids-and-rivers-test:$tbdLibsVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

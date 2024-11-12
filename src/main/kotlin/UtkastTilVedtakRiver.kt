@@ -1,4 +1,10 @@
-import no.nav.helse.rapids_rivers.*
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
@@ -19,7 +25,7 @@ class UtkastTilVedtakRiver(
             }
         }.register(this)
     }
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         sikkerlogg.info("Lagrer nytting data til potensiell G-regulering:\n\t${packet.toJson()}")
         val anvendtGrunnbeløpDto = AnvendtGrunnbeløpDto(
             personidentifikator = packet["fødselsnummer"].asText(),

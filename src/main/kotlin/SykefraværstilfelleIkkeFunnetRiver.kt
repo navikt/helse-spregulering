@@ -1,4 +1,10 @@
-import no.nav.helse.rapids_rivers.*
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
@@ -13,7 +19,7 @@ class SykefraværstilfelleIkkeFunnetRiver(rapidsConnection: RapidsConnection, pr
             }
         }.register(this)
     }
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
         sikkerlogg.info("Sletter sykefraværstilfelle:\n\t${packet.toJson()}")
         anvendtGrunnbeløpDao.slettSykefraværstilfelle(packet["fødselsnummer"].asText(), packet["skjæringstidspunkt"].asLocalDate())
     }
