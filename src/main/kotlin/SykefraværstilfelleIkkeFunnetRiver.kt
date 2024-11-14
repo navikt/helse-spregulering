@@ -12,8 +12,8 @@ class SykefraværstilfelleIkkeFunnetRiver(rapidsConnection: RapidsConnection, pr
 
     init {
         River(rapidsConnection).apply {
+            precondition { it.requireValue("@event_name", "sykefraværstilfelle_ikke_funnet") }
             validate {
-                it.demandValue("@event_name", "sykefraværstilfelle_ikke_funnet")
                 it.requireKey("fødselsnummer")
                 it.require("skjæringstidspunkt") { skjæringstidspunkt -> LocalDate.parse(skjæringstidspunkt.asText()) }
             }

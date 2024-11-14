@@ -9,9 +9,11 @@ class AutomatiskGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, 
 
     init {
         River(rapidsConnection).apply {
+            precondition {
+                it.requireAny("@event_name", listOf("hel_time", "kjør_grunnbeløpsregulering"))
+                it.forbid("riktigGrunnbeløp", "grunnbeløpGjelderFra")
+            }
             validate {
-                it.demandAny("@event_name", listOf("hel_time", "kjør_grunnbeløpsregulering"))
-                it.rejectKey("riktigGrunnbeløp", "grunnbeløpGjelderFra")
                 it.requireKey("system_participating_services")
             }
         }.register(this)

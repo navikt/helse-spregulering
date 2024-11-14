@@ -15,8 +15,8 @@ class UtkastTilVedtakRiver(
 
     init {
         River(rapidsConnection).apply {
+            precondition { it.requireValue("@event_name", "utkast_til_vedtak") }
             validate {
-                it.demandValue("@event_name", "utkast_til_vedtak")
                 it.requireKey("sykepengegrunnlagsfakta.6G", "fødselsnummer")
                 it.require("skjæringstidspunkt") { skjæringstidspunkt ->
                     val dato = LocalDate.parse(skjæringstidspunkt.asText())

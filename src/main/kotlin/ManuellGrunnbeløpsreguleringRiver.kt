@@ -13,8 +13,8 @@ class ManuellGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, pri
 
     init {
         River(rapidsConnection).apply {
+            precondition { it.requireValue("@event_name", "kjør_grunnbeløpsregulering") }
             validate {
-                it.demandValue("@event_name", "kjør_grunnbeløpsregulering")
                 it.require("grunnbeløpGjelderFra") { grunnbeløpGjelderFra -> grunnbeløpGjelderFra.asLocalDate() }
                 it.require("riktigGrunnbeløp") { riktigGrunnbeløp -> SeksG.fraGrunnbeløp(riktigGrunnbeløp.asDouble()) }
                 it.requireKey("system_participating_services")
