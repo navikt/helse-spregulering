@@ -3,8 +3,8 @@ plugins {
 }
 
 val rapidsAndRiversVersion = "2024111509181731658731.11009b44c672"
-val flywayCoreVersion = "10.17.0"
-val postgresqlVersion = "42.7.3"
+val flywayCoreVersion = "10.21.0"
+val postgresqlVersion = "42.7.4"
 val kotliqueryVersion = "1.9.0"
 val hikariCPVersion = "6.1.0"
 val junitJupiterVersion = "5.11.3"
@@ -30,7 +30,6 @@ repositories {
 
 dependencies {
     implementation("com.github.navikt:rapids-and-rivers:$rapidsAndRiversVersion")
-    api("org.flywaydb:flyway-core:$flywayCoreVersion")
     api("org.flywaydb:flyway-database-postgresql:$flywayCoreVersion")
     implementation("com.zaxxer:HikariCP:$hikariCPVersion")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
