@@ -8,7 +8,7 @@ val postgresqlVersion = "42.7.4"
 val kotliqueryVersion = "1.9.0"
 val hikariCPVersion = "6.1.0"
 val junitJupiterVersion = "5.11.3"
-val tbdLibsVersion = "2024.11.25-10.59-6f263a10"
+val tbdLibsVersion = "2025.01.27-12.50-76316f3b"
 val mockkVersion = "1.13.12"
 
 repositories {
