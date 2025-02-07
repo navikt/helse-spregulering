@@ -1,15 +1,16 @@
 import com.github.navikt.tbd_libs.test_support.CleanupStrategy
 import com.github.navikt.tbd_libs.test_support.DatabaseContainers
 import com.github.navikt.tbd_libs.test_support.TestDataSource
+import java.time.LocalDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 val databaseContainer = DatabaseContainers.container("spregulering", CleanupStrategy.tables("anvendt_grunnbeloep"))
 
@@ -99,8 +100,7 @@ class AnvendtGrunnbeløpDaoTest {
         assertEquals(listOf(anvendtGrunnbeløp2), hentAlle())
         val oppdatert3 = oppdatert(personidentifikator, skjæringstidspunkt)
 
-        assertNotEquals(oppdatert2, oppdatert3)
-        //assertEquals(oppdatert2, oppdatert3)
+        assertEquals(oppdatert2, oppdatert3)
     }
 
     @Test

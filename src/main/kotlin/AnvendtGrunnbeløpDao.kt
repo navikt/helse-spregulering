@@ -1,18 +1,21 @@
 import Periode.Companion.overlappendePerioder
+import java.time.LocalDate
+import javax.sql.DataSource
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.intellij.lang.annotations.Language
-import java.time.LocalDate
-import javax.sql.DataSource
 
 class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
     fun lagre(anvendtGrunnbeløpDto: AnvendtGrunnbeløpDto) {
         @Language("PostgreSQL")
         val statement = """
-            INSERT INTO anvendt_grunnbeloep (personidentifikator, skjaeringstidspunkt, seks_g) 
+            INSERT INTO anvendt_grunnbeloep as ag (personidentifikator, skjaeringstidspunkt, seks_g) 
             VALUES (:personidentifikator, :skjaeringstidspunkt, :seks_g)
-            ON CONFLICT(personidentifikator, skjaeringstidspunkt) DO UPDATE SET seks_g=:seks_g, oppdatert=now()
+            ON CONFLICT (personidentifikator, skjaeringstidspunkt) DO UPDATE 
+            SET seks_g=:seks_g, oppdatert=now()
+            WHERE ag.seks_g != excluded.seks_g
         """
+
         sessionOf(dataSource).use { session ->
             session.run(queryOf(statement, mapOf(
                 "personidentifikator" to anvendtGrunnbeløpDto.personidentifikator,
