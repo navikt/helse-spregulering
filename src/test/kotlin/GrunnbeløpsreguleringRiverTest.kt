@@ -64,8 +64,8 @@ class GrunnbeløpsreguleringRiverTest {
     }
 
     @Test
-    fun `kjører automatisk grunnbeløpsregulering hver time`() {
-        testRapid.sendTestMessage(event("hel_time"))
+    fun `kjører automatisk grunnbeløpsregulering ved midnatt`() {
+        testRapid.sendTestMessage(event("midnatt"))
         verify(exactly = 2) { anvendtGrunnbeløpDao.hentFeilanvendteGrunnbeløp(any(), any()) }
         verify(exactly = 1) { anvendtGrunnbeløpDao.perioderMedForskjelligGrunnbeløp() }
         assertEquals(3, testRapid.inspektør.size)
