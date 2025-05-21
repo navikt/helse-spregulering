@@ -51,3 +51,7 @@ spec:
       value: tbd.rapid.v1
     - name: KAFKA_EXTRA_TOPIC
       value: tbd.teknisk.v1
+  observability:
+    logging:
+      destinations:
+        - id: elastic
