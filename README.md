@@ -3,6 +3,21 @@
 Lagrer når vedtaksperioder er beregnet og dets skjæringstidspunkt slik at vi er i stand til å reberegne alle perioder som er utbetalt med feil grunnbeløp.
 Sparker i gang G-regulering på alle perioder som har lagt feil G til grunn når vi har fått vite om den nye G'en.
 
+## Erfaringer fra 2025
+
+- vi oppdaterte spleis med nytt grunnbeløp og ventet til endringen var ute i produksjon
+- vi sendte så eventet `kjør_grunnbeløpsregulering` fra Spout, **uten** å oppgi `riktigGrunnbeløp` og `grunnbeløpGjelderFra`, altså tok vi sikte på `AutomatiskGrunnbeløpsreguleringRiver`
+- spregulering fant 1007 skjæringstidspunkter som trengte G-regulering, men det tidligste var 2. mai 2025, selv om spregulering 
+  hadde flere rader i tabellen `anvendt_grunnbeloep` med skjæringstidspunkt 1. mai 2025 som hadde brukt gammel G.
+- spregulering fant også kun perioder opp til 19. mai, selv om det var perioder med nyere skjæringstidspunkt.
+- basert på litt synsing i koden ser det ut til at spregulering er **avhengig** av å få inn nye utkast til vedtak med ny G på skjæringstidspunkt 1. mai 2025 før den kan kjøre G-regulering,
+  ellers vil den ikke kunne klare å G-regulere alle.
+
+### tiltak til 2026
+- en mulig forenkling kan være at spregulering forholder seg til skjæringstidspunkter `31. desember [inneværende år] <= S >= 1.mai [inneværende år]` (og filtrerer bort de som kan ha fått ny G), slik 
+  at vi unngår at vi går glipp av noen perioder som burde blitt G-regulert.
+- det andre tiltaket kan være at vi **må** sende manuell G-regulering-melding og oppgi riktig periode med `grunnbeløpGjelderFra` og `grunnbeløpGjelderTil`
+
 ## Sånn her G-regulerer man
 
 Å nei, har du blitt valgt ut til å kjøre årets G-regulering? Det pleide å være leit, men nå er det blitt ganske greit.
