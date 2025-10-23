@@ -51,6 +51,14 @@ class UtkastTilVedtakRiverTest {
         }
     }
 
+    @Test
+    fun `lagrer også for eventet anvendt_grunnbeløp`() {
+        testRapid.sendTestMessage(event("anvendt_grunnbeløp", "2020-09-21"))
+        verify(exactly = 1) {
+            anvendtGrunnbeløpDao.lagre(any())
+        }
+    }
+
     @Language("JSON")
     private fun event(eventName: String, skjæringstidspunkt: String = "2024-01-01"): String = """{
         "@event_name": "$eventName",

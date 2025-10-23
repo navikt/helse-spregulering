@@ -15,7 +15,7 @@ class UtkastTilVedtakRiver(
 
     init {
         River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "utkast_til_vedtak") }
+            precondition { it.requireAny("@event_name", listOf("utkast_til_vedtak", "anvendt_grunnbeløp")) }
             validate {
                 it.requireKey("sykepengegrunnlagsfakta.6G", "fødselsnummer")
                 it.require("skjæringstidspunkt") { skjæringstidspunkt ->
