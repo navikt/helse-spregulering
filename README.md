@@ -3,6 +3,17 @@
 Lagrer når vedtaksperioder er beregnet og dets skjæringstidspunkt slik at vi er i stand til å reberegne alle perioder som er utbetalt med feil grunnbeløp.
 Sparker i gang G-regulering på alle perioder som har lagt feil G til grunn når vi har fått vite om den nye G'en.
 
+## Erfaringer fra 2026
+- vi oppdaterte spleis med nytt grunnbeløp og ventet til endringen var ute i produksjon
+- vi sendte så eventet `kjør_grunnbeløpsregulering` fra Spout, **og** oppga `riktigGrunnbeløp` og `grunnbeløpGjelderFra`, altså tok vi sikte på `ManuellGrunnbeløpsreguleringRiver`, ref. erfaringer/tiltak fra 2025
+- spregulering fant 1013 sykefraværstilfeller som trengte G-regulering.
+- 12 av disse ble oppgaver i Speil med egenskapen `Grunnbeløpsregulering`.
+- 25 av disse ble ikke umiddelbart regulert. 21 av disse viste seg å være selvstendig næringsdrivende, og regulering av disse var det ikke bygget støtte for. De resterende 4 var arbeidstakere som ventet på tidligere perioder.
+- resten gikk automatisk.
+
+### tiltak til 2027
+- Dersom vi har implementert nye kategorier, sørg for at det er bygget støtte for å regulere disse før man legger inn nytt grunnbeløp, da slipper man å oppdage det i etterkant.
+
 ## Erfaringer fra 2025
 
 - vi oppdaterte spleis med nytt grunnbeløp og ventet til endringen var ute i produksjon
