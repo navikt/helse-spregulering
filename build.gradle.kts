@@ -1,73 +1,19 @@
 plugins {
-    kotlin("jvm") version "2.3.0"
+    alias(libs.plugins.sykepenger.deployable)
 }
 
-val rapidsAndRiversVersion = "2026011411051768385145.e8ebad1177b4"
-val flywayCoreVersion = "11.5.0"
-val postgresqlVersion = "42.7.7"
-val kotliqueryVersion = "1.9.0"
-val hikariCPVersion = "6.3.0"
-val junitJupiterVersion = "5.12.1"
-val tbdLibsVersion = "2026.01.22-09.16-1d3f6039"
-val mockkVersion = "1.13.17"
-
-// Sett opp repositories basert på om vi kjører i CI eller ikke
-// Jf. https://github.com/navikt/utvikling/blob/main/docs/teknisk/Konsumere%20biblioteker%20fra%20Github%20Package%20Registry.md
-repositories {
-    mavenCentral()
-    if (providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") {
-        maven {
-            url = uri("https://maven.pkg.github.com/navikt/maven-release")
-            credentials {
-                username = "token"
-                password = providers.environmentVariable("GITHUB_TOKEN").orNull!!
-            }
-        }
-    } else {
-        maven("https://repo.adeo.no/repository/github-package-registry-navikt/")
-    }
+sykepengerDeployable {
+    mainClass = "MainKt"
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:$rapidsAndRiversVersion")
-    api("org.flywaydb:flyway-database-postgresql:$flywayCoreVersion")
-    implementation("com.zaxxer:HikariCP:$hikariCPVersion")
-    implementation("org.postgresql:postgresql:$postgresqlVersion")
-    implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
+    implementation(libs.rapidsAndRivers)
+    api(libs.flyway.database.postgresql)
+    implementation(libs.hikariCP)
+    implementation(libs.postgresql)
+    implementation(libs.kotliquery)
 
-    testImplementation("com.github.navikt.tbd-libs:postgres-testdatabaser:$tbdLibsVersion")
-    testImplementation("com.github.navikt.tbd-libs:rapids-and-rivers-test:$tbdLibsVersion")
-    testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-tasks {
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events("skipped", "failed")
-        }
-    }
-    named<Jar>("jar") {
-        archiveBaseName.set("app")
-
-        manifest {
-            attributes["Main-Class"] = "MainKt"
-            attributes["Class-Path"] = configurations.runtimeClasspath.get().joinToString(separator = " ") {
-                it.name
-            }
-        }
-
-        doLast {
-            configurations.runtimeClasspath.get().forEach {
-                val file = File("${layout.buildDirectory.get()}/libs/${it.name}")
-                if (!file.exists())
-                    it.copyTo(file)
-            }
-        }
-    }
-}
-kotlin {
-    jvmToolchain(21)
+    testImplementation(libs.tbdLibs.postgresTestdatabaser)
+    testImplementation(libs.tbdLibs.rapidsAndRiversTest)
+    testImplementation(libs.mockk)
 }

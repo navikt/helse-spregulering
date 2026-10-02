@@ -1,0 +1,17 @@
+spec:
+  replicas:
+    max: 4
+  kafka:
+    pool: nav-dev
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_17
+        diskAutoresize: true
+        tier: db-f1-micro
+        name: spregulering
+        databases:
+          - name: spregulering
+            envVarPrefix: DATABASE
+  env:
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: spregulering-v1
