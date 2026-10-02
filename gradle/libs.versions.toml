@@ -10,7 +10,7 @@ kotliquery = "com.github.seratch:kotliquery:1.9.1"
 mockk = "io.mockk:mockk:1.14.11"
 postgresql = "org.postgresql:postgresql:42.7.7"
 
-rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026011411051768385145.e8ebad1177b4"
+rapidsAndRivers = "com.github.navikt:rapids-and-rivers:2026091610031789545782"
 
 tbdLibs-postgresTestdatabaser = { module = "com.github.navikt.tbd-libs:postgres-testdatabaser", version.ref = "tbdLibs" }
 tbdLibs-rapidsAndRiversTest = { module = "com.github.navikt.tbd-libs:rapids-and-rivers-test", version.ref = "tbdLibs" }
