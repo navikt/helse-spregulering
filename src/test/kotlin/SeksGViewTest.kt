@@ -78,20 +78,30 @@ class SeksGViewTest {
         assertEquals(Observasjon(fem, januar, mars), finnObservasjon(fem))
     }
 
-    private fun AnvendtGrunnbeløpDao.registrer(seksG: SeksG, skjæringstidspunkt: LocalDate) =
-        lagre(AnvendtGrunnbeløpDto(personidentifikator = "2", skjæringstidspunkt = skjæringstidspunkt, `6G`= seksG))
+    private fun AnvendtGrunnbeløpDao.registrer(
+        seksG: SeksG,
+        skjæringstidspunkt: LocalDate,
+    ) = lagre(AnvendtGrunnbeløpDto(personidentifikator = "2", skjæringstidspunkt = skjæringstidspunkt, `6G` = seksG))
 
-    private fun finnObservasjon(seksG: SeksG) = sessionOf(dataSource).use { session ->
-        @Language("PostgreSQL")
-        val statement = "select seks_g, tidligste_skjaeringstidspunkt, seneste_skjaeringstidspunkt from seks_g where seks_g = :seks_g"
-        session.run(queryOf(statement, mapOf("seks_g" to seksG.verdi)).map { row ->
-            Observasjon(
-                SeksG(row.double("seks_g")),
-                row.localDate("tidligste_skjaeringstidspunkt"),
-                row.localDate("seneste_skjaeringstidspunkt")
-            )}.asSingle
-        )
-    }
+    private fun finnObservasjon(seksG: SeksG) =
+        sessionOf(dataSource).use { session ->
+            @Language("PostgreSQL")
+            val statement = "select seks_g, tidligste_skjaeringstidspunkt, seneste_skjaeringstidspunkt from seks_g where seks_g = :seks_g"
+            session.run(
+                queryOf(statement, mapOf("seks_g" to seksG.verdi))
+                    .map { row ->
+                        Observasjon(
+                            SeksG(row.double("seks_g")),
+                            row.localDate("tidligste_skjaeringstidspunkt"),
+                            row.localDate("seneste_skjaeringstidspunkt"),
+                        )
+                    }.asSingle,
+            )
+        }
 
-    private data class Observasjon(val seksG: SeksG, val tidligsteSkjaeringstidspunkt: LocalDate, val senesteSkjaeringstidspunkt: LocalDate)
+    private data class Observasjon(
+        val seksG: SeksG,
+        val tidligsteSkjaeringstidspunkt: LocalDate,
+        val senesteSkjaeringstidspunkt: LocalDate,
+    )
 }

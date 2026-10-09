@@ -7,11 +7,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SykefraværstilfelleIkkeFunnetRiverTest {
-
     private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao = mockk()
-    private val testRapid = TestRapid().apply {
-        SykefraværstilfelleIkkeFunnetRiver(this, anvendtGrunnbeløpDao)
-    }
+    private val testRapid =
+        TestRapid().apply {
+            SykefraværstilfelleIkkeFunnetRiver(this, anvendtGrunnbeløpDao)
+        }
 
     @BeforeEach
     fun setup() {
@@ -35,7 +35,8 @@ class SykefraværstilfelleIkkeFunnetRiverTest {
     }
 
     @Language("JSON")
-    private fun event(eventName: String): String = """{
+    private fun event(eventName: String): String =
+        """{
         "@event_name": "$eventName",
         "skjæringstidspunkt": "2024-01-01",
         "fødselsnummer": "1"

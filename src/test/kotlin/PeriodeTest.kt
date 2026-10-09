@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class PeriodeTest {
-
     @Test
     fun `finner overlappende perioder`() {
         val en = "2020-05-01 - 2021-04-30".periode
@@ -24,6 +23,6 @@ class PeriodeTest {
     }
 
     private companion object {
-        private val String.periode get() = split(" - ").let { Periode(LocalDate.parse(it[0]), LocalDate.parse(it[1]))  }
+        private val String.periode get() = split(" - ").let { Periode(LocalDate.parse(it[0]), LocalDate.parse(it[1])) }
     }
 }

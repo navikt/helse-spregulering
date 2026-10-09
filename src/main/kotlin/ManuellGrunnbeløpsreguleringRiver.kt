@@ -9,25 +9,33 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.helse.rapids_rivers.*
 import java.time.LocalDate
 
-class ManuellGrunnbeløpsreguleringRiver(rapidsConnection: RapidsConnection, private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao): River.PacketListener {
-
+class ManuellGrunnbeløpsreguleringRiver(
+    rapidsConnection: RapidsConnection,
+    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
+) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "kjør_grunnbeløpsregulering") }
-            validate {
-                it.require("grunnbeløpGjelderFra") { grunnbeløpGjelderFra -> grunnbeløpGjelderFra.asLocalDate() }
-                it.require("riktigGrunnbeløp") { riktigGrunnbeløp -> SeksG.fraGrunnbeløp(riktigGrunnbeløp.asDouble()) }
-                it.requireKey("system_participating_services")
-                it.interestedIn("grunnbeløpGjelderTil") { grunnbeløpGjelderTil ->
-                    val fom = it["grunnbeløpGjelderFra"].asLocalDate()
-                    val tom = grunnbeløpGjelderTil.asLocalDate()
-                    Periode(fom, tom)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "kjør_grunnbeløpsregulering") }
+                validate {
+                    it.require("grunnbeløpGjelderFra") { grunnbeløpGjelderFra -> grunnbeløpGjelderFra.asLocalDate() }
+                    it.require("riktigGrunnbeløp") { riktigGrunnbeløp -> SeksG.fraGrunnbeløp(riktigGrunnbeløp.asDouble()) }
+                    it.requireKey("system_participating_services")
+                    it.interestedIn("grunnbeløpGjelderTil") { grunnbeløpGjelderTil ->
+                        val fom = it["grunnbeløpGjelderFra"].asLocalDate()
+                        val tom = grunnbeløpGjelderTil.asLocalDate()
+                        Periode(fom, tom)
+                    }
                 }
-            }
-        }.register(this)
+            }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         val grunnbeløpGjelderFra = packet["grunnbeløpGjelderFra"].asLocalDate()
         val grunnbeløpGjelderTil = packet["grunnbeløpGjelderTil"].takeUnless { it.isMissingOrNull() }?.asLocalDate() ?: LocalDate.MAX
 

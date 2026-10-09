@@ -10,28 +10,35 @@ import java.time.LocalDate
 
 class UtkastTilVedtakRiver(
     rapidsConnection: RapidsConnection,
-    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao
-): River.PacketListener {
-
+    private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
+) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireAny("@event_name", listOf("utkast_til_vedtak", "anvendt_grunnbeløp")) }
-            validate {
-                it.requireKey("sykepengegrunnlagsfakta.6G", "fødselsnummer")
-                it.require("skjæringstidspunkt") { skjæringstidspunkt ->
-                    val dato = LocalDate.parse(skjæringstidspunkt.asText())
-                    check(dato >= Virkningsdato2020Grunnbeløp)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireAny("@event_name", listOf("utkast_til_vedtak", "anvendt_grunnbeløp")) }
+                validate {
+                    it.requireKey("sykepengegrunnlagsfakta.6G", "fødselsnummer")
+                    it.require("skjæringstidspunkt") { skjæringstidspunkt ->
+                        val dato = LocalDate.parse(skjæringstidspunkt.asText())
+                        check(dato >= Virkningsdato2020Grunnbeløp)
+                    }
                 }
-            }
-        }.register(this)
+            }.register(this)
     }
-    override fun onPacket(packet: JsonMessage, context: MessageContext, metadata: MessageMetadata, meterRegistry: MeterRegistry) {
+
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
         sikkerlogg.info("Lagrer nytting data til potensiell G-regulering:\n\t${packet.toJson()}")
-        val anvendtGrunnbeløpDto = AnvendtGrunnbeløpDto(
-            personidentifikator = packet["fødselsnummer"].asText(),
-            skjæringstidspunkt = packet["skjæringstidspunkt"].asLocalDate(),
-            `6G` = SeksG(packet["sykepengegrunnlagsfakta.6G"].asDouble())
-        )
+        val anvendtGrunnbeløpDto =
+            AnvendtGrunnbeløpDto(
+                personidentifikator = packet["fødselsnummer"].asText(),
+                skjæringstidspunkt = packet["skjæringstidspunkt"].asLocalDate(),
+                `6G` = SeksG(packet["sykepengegrunnlagsfakta.6G"].asDouble()),
+            )
         anvendtGrunnbeløpDao.lagre(anvendtGrunnbeløpDto)
     }
 

@@ -1,11 +1,13 @@
 import Periode.Companion.overlappendePerioder
-import java.time.LocalDate
-import javax.sql.DataSource
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.intellij.lang.annotations.Language
+import java.time.LocalDate
+import javax.sql.DataSource
 
-class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
+class AnvendtGrunnbeløpDao(
+    private val dataSource: DataSource,
+) {
     fun lagre(anvendtGrunnbeløpDto: AnvendtGrunnbeløpDto) {
         @Language("PostgreSQL")
         val statement = """
@@ -17,17 +19,22 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
         """
 
         sessionOf(dataSource).use { session ->
-            session.run(queryOf(statement, mapOf(
-                "personidentifikator" to anvendtGrunnbeløpDto.personidentifikator,
-                "skjaeringstidspunkt" to anvendtGrunnbeløpDto.skjæringstidspunkt,
-                "seks_g" to anvendtGrunnbeløpDto.`6G`.verdi
-            )).asExecute)
+            session.run(
+                queryOf(
+                    statement,
+                    mapOf(
+                        "personidentifikator" to anvendtGrunnbeløpDto.personidentifikator,
+                        "skjaeringstidspunkt" to anvendtGrunnbeløpDto.skjæringstidspunkt,
+                        "seks_g" to anvendtGrunnbeløpDto.`6G`.verdi,
+                    ),
+                ).asExecute,
+            )
         }
     }
 
     fun hentFeilanvendteGrunnbeløp(
         periode: Periode,
-        riktigSeksG: SeksG
+        riktigSeksG: SeksG,
     ): List<AnvendtGrunnbeløpDto> {
         @Language("PostgreSQL")
         val statement = """
@@ -37,19 +44,29 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
             AND seks_g != :riktig_seks_g
         """
         return sessionOf(dataSource).use { session ->
-            session.run(queryOf(statement, mapOf(
-                "grunnbeloep_gjelder_fra" to periode.start.postgresifiser,
-                "grunnbeloep_gjelder_til" to periode.endInclusive.postgresifiser,
-                "riktig_seks_g" to riktigSeksG.verdi
-            )).map { AnvendtGrunnbeløpDto(
-                personidentifikator = it.string("personidentifikator"),
-                skjæringstidspunkt = it.localDate("skjaeringstidspunkt"),
-                `6G` = SeksG(it.double("seks_g")),
-            ) }.asList)
+            session.run(
+                queryOf(
+                    statement,
+                    mapOf(
+                        "grunnbeloep_gjelder_fra" to periode.start.postgresifiser,
+                        "grunnbeloep_gjelder_til" to periode.endInclusive.postgresifiser,
+                        "riktig_seks_g" to riktigSeksG.verdi,
+                    ),
+                ).map {
+                    AnvendtGrunnbeløpDto(
+                        personidentifikator = it.string("personidentifikator"),
+                        skjæringstidspunkt = it.localDate("skjaeringstidspunkt"),
+                        `6G` = SeksG(it.double("seks_g")),
+                    )
+                }.asList,
+            )
         }
     }
 
-    fun slettSykefraværstilfelle(personidentifikator: String, skjæringstidspunkt: LocalDate) {
+    fun slettSykefraværstilfelle(
+        personidentifikator: String,
+        skjæringstidspunkt: LocalDate,
+    ) {
         @Language("PostgreSQL")
         val statement = """
             DELETE FROM anvendt_grunnbeloep 
@@ -57,10 +74,15 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
             AND skjaeringstidspunkt = :skjaeringstidspunkt
         """
         sessionOf(dataSource).use { session ->
-            session.run(queryOf(statement, mapOf(
-                "personidentifikator" to personidentifikator,
-                "skjaeringstidspunkt" to skjæringstidspunkt
-            )).asExecute)
+            session.run(
+                queryOf(
+                    statement,
+                    mapOf(
+                        "personidentifikator" to personidentifikator,
+                        "skjaeringstidspunkt" to skjæringstidspunkt,
+                    ),
+                ).asExecute,
+            )
         }
     }
 
@@ -70,13 +92,18 @@ class AnvendtGrunnbeløpDao(private val dataSource: DataSource) {
             SELECT * FROM seks_g
             WHERE seks_g >= $SeksG2023
         """
-        val grunnbeløp = sessionOf(dataSource).use { session ->
-            session.run(queryOf(statement).map { row ->
-                val periode = Periode(row.localDate("tidligste_skjaeringstidspunkt"), row.localDate("seneste_skjaeringstidspunkt"))
-                val seksG = SeksG(row.double("seks_g"))
-                seksG to periode
-            }.asList).toMap()
-        }
+        val grunnbeløp =
+            sessionOf(dataSource).use { session ->
+                session
+                    .run(
+                        queryOf(statement)
+                            .map { row ->
+                                val periode = Periode(row.localDate("tidligste_skjaeringstidspunkt"), row.localDate("seneste_skjaeringstidspunkt"))
+                                val seksG = SeksG(row.double("seks_g"))
+                                seksG to periode
+                            }.asList,
+                    ).toMap()
+            }
 
         // Finner alle perioder som har forskjellig grunnbeløp og kobler de mot det største grunnbeløpet, som det er naturlig å tro at er det riktige.
         return grunnbeløp.values.overlappendePerioder().associateWith { periodeMedForskjelligeGrunnbeløp ->

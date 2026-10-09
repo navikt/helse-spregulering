@@ -7,11 +7,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class UtkastTilVedtakRiverTest {
-
     private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao = mockk()
-    private val testRapid = TestRapid().apply {
-        UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao)
-    }
+    private val testRapid =
+        TestRapid().apply {
+            UtkastTilVedtakRiver(this, anvendtGrunnbeløpDao)
+        }
 
     @BeforeEach
     fun setup() {
@@ -42,7 +42,6 @@ class UtkastTilVedtakRiverTest {
         }
     }
 
-
     @Test
     fun `lagrer fra og med da vi var ferdig med gammal moro`() {
         testRapid.sendTestMessage(event("utkast_til_vedtak", "2020-09-21"))
@@ -60,7 +59,11 @@ class UtkastTilVedtakRiverTest {
     }
 
     @Language("JSON")
-    private fun event(eventName: String, skjæringstidspunkt: String = "2024-01-01"): String = """{
+    private fun event(
+        eventName: String,
+        skjæringstidspunkt: String = "2024-01-01",
+    ): String =
+        """{
         "@event_name": "$eventName",
         "fødselsnummer": "fødselsnummer",
         "skjæringstidspunkt": "$skjæringstidspunkt",

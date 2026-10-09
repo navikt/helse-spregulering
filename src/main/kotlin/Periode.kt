@@ -1,7 +1,10 @@
 import java.time.LocalDate
 
-class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, Iterable<LocalDate> {
-
+class Periode(
+    fom: LocalDate,
+    tom: LocalDate,
+) : ClosedRange<LocalDate>,
+    Iterable<LocalDate> {
     override val start: LocalDate = fom
     override val endInclusive: LocalDate = tom
 
@@ -25,17 +28,16 @@ class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, Iterable<
         return this
     }
 
-    override operator fun iterator() = object : Iterator<LocalDate> {
-        private var currentDate: LocalDate = start
+    override operator fun iterator() =
+        object : Iterator<LocalDate> {
+            private var currentDate: LocalDate = start
 
-        override fun hasNext() = endInclusive >= currentDate
+            override fun hasNext() = endInclusive >= currentDate
 
-        override fun next() =
-            currentDate.also { currentDate = it.plusDays(1) }
-    }
+            override fun next() = currentDate.also { currentDate = it.plusDays(1) }
+        }
 
-    operator fun contains(other: Periode) =
-        this.start <= other.start && this.endInclusive >= other.endInclusive
+    operator fun contains(other: Periode) = this.start <= other.start && this.endInclusive >= other.endInclusive
 
     operator fun plus(annen: Periode?): Periode {
         if (annen == null) return this
@@ -54,9 +56,11 @@ class Periode(fom: LocalDate, tom: LocalDate): ClosedRange<LocalDate>, Iterable<
             val sortert = sortedBy { it.start }
             sortert.forEachIndexed { index, periode ->
                 if (resultat.any { champion -> periode in champion }) return@forEachIndexed // en annen periode har spist opp denne
-                resultat.add(sortert.subList(index, sortert.size).reduce { champion, challenger ->
-                    champion.merge(challenger)
-                })
+                resultat.add(
+                    sortert.subList(index, sortert.size).reduce { champion, challenger ->
+                        champion.merge(challenger)
+                    },
+                )
             }
             return resultat
         }

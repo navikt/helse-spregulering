@@ -5,13 +5,16 @@ import org.slf4j.LoggerFactory
 class Grunnbeløpsregulering(
     private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao,
     private val context: MessageContext,
-    packet: JsonMessage
+    packet: JsonMessage,
 ) {
     private val manueltInitiert = packet["@event_name"].asText() == "kjør_grunnbeløpsregulering"
     private val systemParticipatingServices = packet["system_participating_services"]
     private val skalReguleres = mutableMapOf<Periode, SeksG>()
 
-    fun leggTil(periode: Periode, riktigSeksG: SeksG): Grunnbeløpsregulering {
+    fun leggTil(
+        periode: Periode,
+        riktigSeksG: SeksG,
+    ): Grunnbeløpsregulering {
         check(skalReguleres[periode] == null) { "Hei! dette går ikke an! $periode er allerede lagt til." }
         skalReguleres[periode] = riktigSeksG
         return this
@@ -31,7 +34,7 @@ class Grunnbeløpsregulering(
 
             feilanvendteGrunnbeløp.forEach { feilanvendtGrunnbeløp ->
                 val grunnbeløpsreguleringEvent = feilanvendtGrunnbeløp.toGrunnbeløpsreguleringEvent()
-                sikkerlogg.info("Sender grunnbeløpsregulering:\n\t${grunnbeløpsreguleringEvent}")
+                sikkerlogg.info("Sender grunnbeløpsregulering:\n\t$grunnbeløpsreguleringEvent")
                 context.publish(feilanvendtGrunnbeløp.personidentifikator, grunnbeløpsreguleringEvent)
             }
         }
@@ -55,11 +58,16 @@ class Grunnbeløpsregulering(
     }
 
     private fun MessageContext.sendPåSlack(melding: String) {
-        val slackmelding = JsonMessage.newMessage("slackmelding", mapOf(
-            "melding" to "\n\n$melding\n\n - Deres erbødig SPregulering :money:",
-            "level" to "INFO",
-            "system_participating_services" to systemParticipatingServices
-        )).toJson()
+        val slackmelding =
+            JsonMessage
+                .newMessage(
+                    "slackmelding",
+                    mapOf(
+                        "melding" to "\n\n$melding\n\n - Deres erbødig SPregulering :money:",
+                        "level" to "INFO",
+                        "system_participating_services" to systemParticipatingServices,
+                    ),
+                ).toJson()
 
         publish(slackmelding)
     }
@@ -68,9 +76,14 @@ class Grunnbeløpsregulering(
         private val sikkerlogg = LoggerFactory.getLogger("tjenestekall")
         private const val Gladmelding = "Alle sykefraværstilfeller har rett grunnbeløp. Bare å lene seg tilbake å njuta."
 
-        private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() = JsonMessage.newMessage("grunnbeløpsregulering", mapOf(
-            "fødselsnummer" to personidentifikator,
-            "skjæringstidspunkt" to skjæringstidspunkt
-        )).toJson()
+        private fun AnvendtGrunnbeløpDto.toGrunnbeløpsreguleringEvent() =
+            JsonMessage
+                .newMessage(
+                    "grunnbeløpsregulering",
+                    mapOf(
+                        "fødselsnummer" to personidentifikator,
+                        "skjæringstidspunkt" to skjæringstidspunkt,
+                    ),
+                ).toJson()
     }
 }

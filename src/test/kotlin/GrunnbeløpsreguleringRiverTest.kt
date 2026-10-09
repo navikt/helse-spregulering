@@ -11,12 +11,12 @@ import java.time.LocalDate.MAX
 import java.time.LocalDate.MIN
 
 class GrunnbeløpsreguleringRiverTest {
-
     private val anvendtGrunnbeløpDao: AnvendtGrunnbeløpDao = mockk()
-    private val testRapid = TestRapid().apply {
-        ManuellGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
-        AutomatiskGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
-    }
+    private val testRapid =
+        TestRapid().apply {
+            ManuellGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
+            AutomatiskGrunnbeløpsreguleringRiver(this, anvendtGrunnbeløpDao)
+        }
     private val perioderMedFeilGrunnbeløp = mapOf(Periode(MIN, MIN) to SeksG(600_000), Periode(MAX, MAX) to SeksG(660_000))
     private val feilanvendtGrunnbeløp = listOf(AnvendtGrunnbeløpDto("1", LocalDate.parse("2018-01-01"), SeksG(720_000)))
 
@@ -75,7 +75,11 @@ class GrunnbeløpsreguleringRiverTest {
     }
 
     @Language("JSON")
-    private fun manueltEvent(riktigGrunnbeløp: Double, tom: LocalDate? = null): String = """{
+    private fun manueltEvent(
+        riktigGrunnbeløp: Double,
+        tom: LocalDate? = null,
+    ): String =
+        """{
         "@event_name": "kjør_grunnbeløpsregulering",
         "grunnbeløpGjelderFra": "2024-01-01",
         "grunnbeløpGjelderTil": ${tom?.let { "\"$it\"" }},
@@ -85,6 +89,14 @@ class GrunnbeløpsreguleringRiverTest {
     @Language("JSON")
     private fun event(navn: String): String = """{ "@event_name": "$navn" }"""
 
-    private fun assertMeldingstype(index: Int, forventet: String) =
-        assertEquals(forventet,testRapid.inspektør.message(index).path("@event_name").asText())
+    private fun assertMeldingstype(
+        index: Int,
+        forventet: String,
+    ) = assertEquals(
+        forventet,
+        testRapid.inspektør
+            .message(index)
+            .path("@event_name")
+            .asText(),
+    )
 }
